@@ -1,0 +1,51 @@
+plugins {
+    id 'com.zyxist.chainsaw' version '0.1.3'
+}
+
+apply plugin: 'osgi'
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+group = 'cool.pandora'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url "$buildDir/maven"
+        }
+    }
+}
+
+ext {
+    javaModule.name = 'cool.pandora.modeller.ldpclient'
+    moduleName = 'cool.pandora.modeller.ldpclient'
+    slf4jVersion = "1.7.25"
+    commonsRdfVersion = '0.5.0'
+    jaxrsVersion = '2.1'
+    projectOsgiVersion = project.version.replaceAll("-SNAPSHOT", ".SNAPSHOT")
+}
+
+
+dependencies {
+    compile group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
+    compile group: 'org.apache.commons', name: 'commons-rdf-jena', version: commonsRdfVersion
+    compile "javax.ws.rs:javax.ws.rs-api:${jaxrsVersion}"
+}
+
+jar {
+    manifest {
+        instruction 'Automatic-Module-Name', moduleName
+        instruction 'Import-Package', '*'
+        instruction 'Export-Package', "${moduleName};version=${projectOsgiVersion}"
+    }
+}

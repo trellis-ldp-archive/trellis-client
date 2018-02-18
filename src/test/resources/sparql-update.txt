@@ -1,0 +1,1 @@
+INSERT { <> <http://purl.org/dc/terms/title> "A title" } WHERE {}

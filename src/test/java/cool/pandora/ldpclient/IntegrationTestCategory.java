@@ -11,12 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-module cool.pandora.ldpclient {
-    exports cool.pandora.ldpclient;
-    requires org.apache.commons.rdf.api;
-    requires jena.osgi;
-    requires slf4j.api;
-    requires java.ws.rs;
-    requires org.trellisldp.vocabulary;
-    requires jdk.incubator.httpclient;
+
+package cool.pandora.ldpclient;
+
+/**
+ * @author christopher-johnson
+ */
+interface IntegrationTestCategory {
 }

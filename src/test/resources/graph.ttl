@@ -1,0 +1,3 @@
+<> <http://purl.org/dc/terms/title> "A title" .
+<> <http://www.w3.org/ns/oa#hasBody> "A Body" .
+<http://example.org/anno38> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/oa#HttpRequestState>

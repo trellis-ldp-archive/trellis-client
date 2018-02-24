@@ -220,6 +220,26 @@ public interface LdpClient {
             InterruptedException;
 
     /**
+     *
+     * @param identifier a resource identifier
+     * @param metadata a {@link Map} of headers
+     * @return body as a {@link String}
+     */
+    String getWithMetadata(IRI identifier, Map<String, String> metadata) throws URISyntaxException,
+            IOException,
+            InterruptedException;
+
+    /**
+     *
+     * @param identifier a resource identifier
+     * @param metadata a {@link Map} of headers
+     * @return body as a byte[]
+     */
+    byte[] getBytesWithMetadata(IRI identifier, Map<String, String> metadata) throws URISyntaxException,
+            IOException,
+            InterruptedException;
+
+    /**
      * @param identifier a resource identifier
      */
     Map<String, List<String>> options(final IRI identifier) throws URISyntaxException,
@@ -231,6 +251,14 @@ public interface LdpClient {
      * @param metadata a {@link Map} of headers
      */
     void post(final IRI identifier, final InputStream stream, final Map<String, String> metadata)
+            throws URISyntaxException, IOException, InterruptedException;
+
+    /**
+     * @param identifier a resource identifier
+     * @param stream an {@link InputStream}
+     * @param metadata a {@link Map} of headers
+     */
+    void postWithMetadata(final IRI identifier, final InputStream stream, final Map<String, String> metadata)
             throws URISyntaxException, IOException, InterruptedException;
 
     /**
@@ -265,6 +293,15 @@ public interface LdpClient {
      * @param metadata a {@link Map} of headers
      */
     void put(final IRI identifier, final InputStream stream,
+             final Map<String, String> metadata) throws URISyntaxException, IOException,
+            InterruptedException;
+
+    /**
+     * @param identifier a resource identifier
+     * @param stream an {@link InputStream}
+     * @param metadata a {@link Map} of headers
+     */
+    void putWithMetadata(final IRI identifier, final InputStream stream,
              final Map<String, String> metadata) throws URISyntaxException, IOException,
             InterruptedException;
 

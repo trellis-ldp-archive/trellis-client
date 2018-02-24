@@ -22,6 +22,7 @@ import static java.util.Arrays.stream;
 import static java.util.Base64.getEncoder;
 import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toList;
+import static javax.ws.rs.core.HttpHeaders.ACCEPT;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static javax.ws.rs.core.HttpHeaders.LINK;
@@ -55,12 +56,17 @@ import javax.ws.rs.core.Link;
 import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.jena.JenaRDF;
 import org.apache.jena.riot.WebContent;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.trellisldp.app.TrellisApplication;
 import org.trellisldp.app.config.TrellisConfiguration;
 import org.trellisldp.vocabulary.DC;
 import org.trellisldp.vocabulary.JSONLD;
 import org.trellisldp.vocabulary.LDP;
+import org.trellisldp.vocabulary.Trellis;
 
 /**
  * LdpClientTest.
@@ -402,6 +408,19 @@ class LdpClientTest {
     }
 
     @Test
+    void testGetWithEntrySet() throws InterruptedException, IOException, URISyntaxException {
+        final IRI identifier = rdf.createIRI(baseUrl + pid);
+        final Map<String, String> metadata = singletonMap(
+                CONTENT_TYPE, WebContent.contentTypeTurtle);
+        client.put(identifier, getTestGraph(), metadata);
+        final Map<String, String> headers = new HashMap<>();
+        headers.put("Prefer", "return=representation; include=\""
+                + Trellis.PreferServerManaged.getIRIString() + "\"");
+        headers.put(ACCEPT, WebContent.contentTypeJSONLD);
+        final String res = client.getWithMetadata(identifier, headers);
+    }
+
+    @Test
     void testOptions() throws InterruptedException, IOException, URISyntaxException {
         final IRI identifier = rdf.createIRI(baseUrl + pid);
         final Map<String, String> metadata = singletonMap(
@@ -418,6 +437,17 @@ class LdpClientTest {
                 CONTENT_TYPE, WebContent.contentTypeTurtle);
         client.newLdpDc(container, pid, container);
         client.post(identifier, getTestResource(), metadata);
+    }
+
+    @Test
+    void testPostWithMetadata() throws InterruptedException, IOException, URISyntaxException {
+        final IRI identifier = rdf.createIRI(baseUrl + pid);
+        final IRI container = rdf.createIRI(baseUrl);
+        final Map<String, String> metadata = new HashMap<>();
+        metadata.put(CONTENT_TYPE, WebContent.contentTypeTextPlain);
+        metadata.put("Digest", "md5=1VOyRwUXW1CPdC5nelt7GQ==");
+        client.newLdpDc(container, pid, container);
+        client.postWithMetadata(identifier, getTestBinary(), metadata);
     }
 
     @Test
@@ -455,6 +485,16 @@ class LdpClientTest {
         final String digest = "md5=1VOyRwUXW1CPdC5nelt7GQ==";
         client.newLdpDc(container, pid, container);
         client.postBinaryWithDigest(identifier, getTestBinary(), metadata, digest);
+    }
+
+    @Test
+    void testPutWithMetadata() throws InterruptedException, IOException, URISyntaxException {
+        final IRI identifier = rdf.createIRI(baseUrl + pid);
+        final Map<String, String> metadata = new HashMap<>();
+        metadata.put(CONTENT_TYPE, WebContent.contentTypeTurtle);
+        metadata.put("Etag", "053036f0a8a95b3ecf4fee30b9c3145f");
+        client.put(identifier, getTestResource(), metadata);
+        client.putWithMetadata(identifier, getRevisedTestResource(), metadata);
     }
 
     @Test

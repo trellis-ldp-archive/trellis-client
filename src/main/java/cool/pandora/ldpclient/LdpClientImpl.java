@@ -17,6 +17,7 @@ package cool.pandora.ldpclient;
 import static java.time.Instant.ofEpochMilli;
 import static java.time.ZoneOffset.UTC;
 import static java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME;
+import static java.util.Collections.synchronizedList;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
@@ -32,6 +33,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -41,6 +43,7 @@ import java.util.concurrent.Executors;
 import javax.net.ssl.SSLContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+
 import jdk.incubator.http.HttpClient;
 import jdk.incubator.http.HttpRequest;
 import jdk.incubator.http.HttpResponse;
@@ -104,6 +107,15 @@ public class LdpClientImpl implements LdpClient {
         }
 
         return "?" + sq + pq + oq;
+    }
+
+    private synchronized String[] buildHeaderEntryList(final Map<String, String> metadata) {
+        final List<String> h = synchronizedList(new ArrayList<>());
+        metadata.forEach((key, value) -> {
+            h.add(key);
+            h.add(value);
+        });
+        return h.toArray(new String[h.size()]);
     }
 
     @Override
@@ -247,7 +259,6 @@ public class LdpClientImpl implements LdpClient {
         log.info(
                 String.valueOf(response.version()) + " GET request to {} returned {}", identifier,
                 String.valueOf(response.statusCode()));
-        ;
         return response.body();
     }
 
@@ -452,6 +463,36 @@ public class LdpClientImpl implements LdpClient {
     }
 
     @Override
+    public String getWithMetadata(final IRI identifier, final Map<String, String> metadata) throws
+            URISyntaxException, IOException, InterruptedException {
+        requireNonNull(identifier, NON_NULL_IDENTIFIER);
+        final String[] entries = buildHeaderEntryList(metadata);
+        final HttpRequest req = HttpRequest.newBuilder(new URI(identifier.getIRIString()))
+                .headers(entries).GET().build();
+        final HttpResponse<String> response = client.send(req, asString());
+        log.info(
+                String.valueOf(response.version()) + " GET request to {} returned {}",
+                identifier,
+                String.valueOf(response.statusCode()));
+        return response.body();
+    }
+
+    @Override
+    public byte[] getBytesWithMetadata(final IRI identifier, final Map<String, String> metadata) throws
+            URISyntaxException, IOException, InterruptedException {
+        requireNonNull(identifier, NON_NULL_IDENTIFIER);
+        final String[] entries = buildHeaderEntryList(metadata);
+        final HttpRequest req = HttpRequest.newBuilder(new URI(identifier.getIRIString()))
+                .headers(entries).GET().build();
+        final HttpResponse<byte[]> response = client.send(req, asByteArray());
+        log.info(
+                String.valueOf(response.version()) + " GET request to {} returned {}",
+                identifier,
+                String.valueOf(response.statusCode()));
+        return response.body();
+    }
+
+    @Override
     public Map<String, List<String>> options(final IRI identifier) throws URISyntaxException,
             IOException, InterruptedException {
         requireNonNull(identifier, NON_NULL_IDENTIFIER);
@@ -485,6 +526,23 @@ public class LdpClientImpl implements LdpClient {
     }
 
     @Override
+    public void postWithMetadata(final IRI identifier, final InputStream stream, final Map<String, String>
+            metadata) throws URISyntaxException, IOException, InterruptedException {
+        requireNonNull(identifier, NON_NULL_IDENTIFIER);
+        final String[] entries = buildHeaderEntryList(metadata);
+        final HttpRequest req = HttpRequest.newBuilder(new URI(identifier.getIRIString()))
+                .headers(entries)
+                .POST(HttpRequest.BodyProcessor.fromInputStream(() -> stream)).build();
+        final HttpResponse<String> response = client.send(req, asString());
+        log.info(
+                "New Resource Location {}",
+                String.valueOf(response.headers().map().get("Location")));
+        log.info(
+                String.valueOf(response.version()) + " POST request to {} returned {}", identifier,
+                String.valueOf(response.statusCode()));
+    }
+
+    @Override
     public void postWithAuth(final IRI identifier, final InputStream stream, final Map<String,
             String>
             metadata) throws URISyntaxException, IOException, InterruptedException {
@@ -504,7 +562,7 @@ public class LdpClientImpl implements LdpClient {
                 "New Resource Location {}",
                 String.valueOf(response.headers().map().get("Location")));
         log.info(
-                String.valueOf(response.version()) + " POST request to {} returned {}", identifier,
+                String.valueOf(response.version()) + " AUTHORIZED POST request to {} returned {}", identifier,
                 String.valueOf(response.statusCode()));
     }
 
@@ -579,6 +637,21 @@ public class LdpClientImpl implements LdpClient {
         final HttpRequest req = HttpRequest.newBuilder(new URI(identifier.getIRIString()))
                 .headers(
                         HttpHeaders.CONTENT_TYPE, contentType.toString())
+                .PUT(HttpRequest.BodyProcessor.fromInputStream(() -> stream)).build();
+        final HttpResponse<String> response = client.send(req, asString());
+        log.info(
+                String.valueOf(response.version()) + " PUT request to {} returned {}", identifier,
+                String.valueOf(response.statusCode()));
+    }
+
+    @Override
+    public void putWithMetadata(final IRI identifier, final InputStream stream,
+                    final Map<String, String> metadata) throws URISyntaxException, IOException,
+            InterruptedException {
+        requireNonNull(identifier, NON_NULL_IDENTIFIER);
+        final String[] entries = buildHeaderEntryList(metadata);
+        final HttpRequest req = HttpRequest.newBuilder(new URI(identifier.getIRIString()))
+                .headers(entries)
                 .PUT(HttpRequest.BodyProcessor.fromInputStream(() -> stream)).build();
         final HttpResponse<String> response = client.send(req, asString());
         log.info(

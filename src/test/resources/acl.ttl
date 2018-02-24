@@ -1,7 +1,7 @@
 @prefix acl: <http://www.w3.org/ns/auth/acl#>.
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
-<http://trellis:8080/#auth>
+<#auth> a acl:Authorization;
         acl:mode        acl:Read ;
         acl:mode        acl:Write ;
         acl:mode        acl:Control ;

@@ -14,6 +14,7 @@
 module cool.pandora.ldpclient {
     exports cool.pandora.ldpclient;
     requires org.apache.commons.rdf.api;
+    requires org.apache.commons.rdf.jena;
     requires jena.osgi;
     requires slf4j.api;
     requires java.ws.rs;

@@ -218,4 +218,9 @@ jar {
     }
 }
 
-tasks.withType(Javadoc).all { enabled = false }
+javadoc {
+    inputs.property("moduleName", moduleName)
+    doFirst {
+        options.addStringOption('-module-path', classpath.asPath)
+    }
+}

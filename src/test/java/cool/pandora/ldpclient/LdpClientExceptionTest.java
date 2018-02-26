@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 class LdpClientExceptionTest {
     private static final JenaRDF rdf = new JenaRDF();
     private final LdpClientImpl client = new LdpClientImpl();
+    private final IRI identifier = rdf.createIRI("httq://some.fictitious.org");
 
     @Test
     void testException1() {
@@ -58,63 +59,51 @@ class LdpClientExceptionTest {
         assertEquals(msg, ex.getMessage());
     }
 
+    //Note: for exception test coverage
     @Test
     void testURISyntaxException() {
-        assertThrows(LdpClientException.class, () -> {
-            final IRI identifier = rdf.createIRI("httq://some.fictitious.org");
-            client.head(identifier);
-        });
-        assertThrows(LdpClientException.class, () -> {
-            final IRI identifier = rdf.createIRI("httq://some.fictitious.org");
-            client.getJson(identifier);
-        });
-        assertThrows(LdpClientException.class, () -> {
-            final IRI identifier = rdf.createIRI("httq://some.fictitious.org");
-            client.getDefaultType(identifier);
-        });
-        assertThrows(LdpClientException.class, () -> {
-            final IRI identifier = rdf.createIRI("httq://some.fictitious.org");
-            client.getWithContentType(identifier, null);
-        });
-        assertThrows(LdpClientException.class, () -> {
-            final IRI identifier = rdf.createIRI("httq://some.fictitious.org");
-            client.getAcceptDatetime(identifier, null);
-        });
-        assertThrows(LdpClientException.class, () -> {
-            final IRI identifier = rdf.createIRI("httq://some.fictitious.org");
-            client.getTimeMapLinkDefaultFormat(identifier);
-        });
-        assertThrows(LdpClientException.class, () -> {
-            final IRI identifier = rdf.createIRI("httq://some.fictitious.org");
-            client.getTimeMapJsonProfile(identifier, null);
-        });
-        assertThrows(LdpClientException.class, () -> {
-            final IRI identifier = rdf.createIRI("httq://some.fictitious.org");
-            client.getVersionJson(identifier, null, null);
-        });
-        assertThrows(LdpClientException.class, () -> {
-            final IRI identifier = rdf.createIRI("httq://some.fictitious.org");
-            client.getBinary(identifier);
-        });
-        assertThrows(LdpClientException.class, () -> {
-            final IRI identifier = rdf.createIRI("httq://some.fictitious.org");
-            client.getBinary(identifier, null);
-        });
-        assertThrows(LdpClientException.class, () -> {
-            final IRI identifier = rdf.createIRI("httq://some.fictitious.org");
-            client.getBinary(identifier);
-        });
-        assertThrows(LdpClientException.class, () -> {
-            final IRI identifier = rdf.createIRI("httq://some.fictitious.org");
-            client.getBinaryDigest(identifier, "sha256");
-        });
-        assertThrows(LdpClientException.class, () -> {
-            final IRI identifier = rdf.createIRI("httq://some.fictitious.org");
-            client.getBinaryVersion(identifier, null);
-        });
-        assertThrows(LdpClientException.class, () -> {
-            final IRI identifier = rdf.createIRI("httq://some.fictitious.org");
-            client.getBinaryVersion(identifier, null, null);
-        });
+        assertThrows(LdpClientException.class, () -> client.head(identifier));
+        assertThrows(LdpClientException.class, () -> client.getJson(identifier));
+        assertThrows(LdpClientException.class, () -> client.getDefaultType(identifier));
+        assertThrows(LdpClientException.class, () -> client.getWithContentType(identifier, null));
+        assertThrows(LdpClientException.class, () -> client.getAcceptDatetime(identifier, null));
+        assertThrows(LdpClientException.class, () -> client.getTimeMapLinkDefaultFormat(identifier));
+        assertThrows(LdpClientException.class, () -> client.getTimeMapJsonProfile(identifier, null));
+        assertThrows(LdpClientException.class, () -> client.getVersionJson(identifier, null, null));
+        assertThrows(LdpClientException.class, () -> client.getBinary(identifier));
+        assertThrows(LdpClientException.class, () -> client.getBinary(identifier, null));
+        assertThrows(LdpClientException.class, () -> client.getBinary(identifier));
+        assertThrows(LdpClientException.class, () -> client.getBinaryDigest(identifier, "sha256"));
+        assertThrows(LdpClientException.class, () -> client.getBinaryVersion(identifier, null));
+        assertThrows(LdpClientException.class, () -> client.getBinaryVersion(identifier, null, null));
+        assertThrows(LdpClientException.class, () -> client.getRange(identifier, null));
+        assertThrows(LdpClientException.class, () -> client.getPrefer(identifier, null));
+        assertThrows(LdpClientException.class, () -> client.getPreferServerManaged(identifier));
+        assertThrows(LdpClientException.class, () -> client.getPreferMinimal(identifier));
+        assertThrows(LdpClientException.class, () -> client.getJsonProfile(identifier, null));
+        assertThrows(LdpClientException.class, () -> client.getJsonProfileLDF(identifier, null, null, null, null));
+        assertThrows(LdpClientException.class, () -> client.getJsonLDF(identifier, null, null, null));
+        assertThrows(LdpClientException.class, () -> client.getAcl(identifier, null));
+        assertThrows(LdpClientException.class, () -> client.getCORS(identifier, null));
+        assertThrows(LdpClientException.class, () -> client.getCORSSimple(identifier, null));
+        assertThrows(LdpClientException.class, () -> client.getWithMetadata(identifier, null));
+        assertThrows(LdpClientException.class, () -> client.getBytesWithMetadata(identifier, null));
+        assertThrows(LdpClientException.class, () -> client.getResponse(identifier, null));
+        assertThrows(LdpClientException.class, () -> client.options(identifier));
+        assertThrows(LdpClientException.class, () -> client.post(identifier, null, null));
+        assertThrows(LdpClientException.class, () -> client.postWithMetadata(identifier, null, null));
+        assertThrows(LdpClientException.class, () -> client.postWithAuth(identifier, null, null, null));
+        assertThrows(LdpClientException.class, () -> client.postSlug(identifier, null, null, null));
+        assertThrows(LdpClientException.class, () -> client.postBinaryWithDigest(identifier, null, null, null));
+        assertThrows(LdpClientException.class, () -> client.newLdpDc(identifier, null, null));
+        assertThrows(LdpClientException.class, () -> client.newLdpDcWithAuth(identifier, null, null, null));
+        assertThrows(LdpClientException.class, () -> client.put(identifier, null, null));
+        assertThrows(LdpClientException.class, () -> client.putWithMetadata(identifier, null, null));
+        assertThrows(LdpClientException.class, () -> client.putWithAuth(identifier, null, null, null));
+        assertThrows(LdpClientException.class, () -> client.putIfMatch(identifier, null, null, null));
+        assertThrows(LdpClientException.class, () -> client.putBinaryWithDigest(identifier, null, null, null));
+        assertThrows(LdpClientException.class, () -> client.putIfUnmodified(identifier, null, null, null));
+        assertThrows(LdpClientException.class, () -> client.delete(identifier));
+        assertThrows(LdpClientException.class, () -> client.patch(identifier, null));
     }
 }

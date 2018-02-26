@@ -2,7 +2,12 @@ server:
   applicationConnectors:
     - type: http
       port: 0
-
+    - type: h2
+      port: 8445
+      keyStorePath: trellis.jks
+      keyStorePassword: "changeme"
+      validateCerts: false
+      validatePeers: false
 logging:
   level: WARN
   loggers:

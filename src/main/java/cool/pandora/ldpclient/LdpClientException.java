@@ -20,6 +20,8 @@ package cool.pandora.ldpclient;
  * @author christopher-johnson
  */
 public class LdpClientException extends Exception {
+    private static final long serialVersionUID = -2402999298460159803L;
+
     /**
      * Create a new LdpClientException.
      */
@@ -40,7 +42,7 @@ public class LdpClientException extends Exception {
      * Create a new LdpClientException with a custom message and known cause.
      *
      * @param message the message
-     * @param cause   the cause
+     * @param cause the cause
      */
     public LdpClientException(final String message, final Throwable cause) {
         super(message, cause);

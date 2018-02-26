@@ -23,8 +23,8 @@ apply plugin: 'osgi'
 
 group = 'cool.pandora'
 
-sourceCompatibility = 1.9
-targetCompatibility = 1.9
+sourceCompatibility = 1.10
+targetCompatibility = 1.10
 
 repositories {
     mavenLocal()
@@ -43,7 +43,8 @@ ext {
     license = 'Apache 2'
 
     dropwizardVersion = '1.2.0'
-    junitVersion = "5.1.0"
+    jettyAlpnVersion = '9.4.8.v20171121'
+    junitVersion = '5.1.0'
     logbackVersion = '1.2.3'
     slf4jVersion = "1.7.25"
     commonsRdfVersion = '0.5.0'
@@ -185,6 +186,7 @@ dependencies {
     testCompile("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
     testCompile group: 'io.dropwizard', name: 'dropwizard-testing', version: dropwizardVersion
+    testCompile group: 'org.eclipse.jetty', name: 'jetty-alpn-java-server', version: jettyAlpnVersion
     testCompile group: 'org.trellisldp', name: 'trellis-app', version: trellisAppVersion
     testCompile group: 'org.apache.commons', name: 'commons-rdf-jena', version: commonsRdfVersion
     testRuntimeClasspath group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
@@ -222,5 +224,13 @@ javadoc {
     inputs.property("moduleName", moduleName)
     doFirst {
         options.addStringOption('-module-path', classpath.asPath)
+        options.addBooleanOption('html5', true)
+    }
+    destinationDir = new File(projectDir, "docs/${version}")
+    options {
+        links "https://docs.oracle.com/javase/8/docs/api/"
+        links 'https://docs.oracle.com/javaee/7/api/'
+        links 'https://trellis-ldp.github.io/trellis/apidocs/'
+        links 'https://commons.apache.org/proper/commons-rdf/apidocs/'
     }
 }

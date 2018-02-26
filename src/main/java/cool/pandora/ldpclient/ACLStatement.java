@@ -17,19 +17,19 @@ package cool.pandora.ldpclient;
 import static org.apache.jena.riot.RDFFormat.NTRIPLES;
 import static org.apache.jena.riot.system.StreamRDFWriter.getWriterStream;
 
+import java.io.ByteArrayOutputStream;
+import java.util.Set;
 import org.apache.commons.rdf.api.Graph;
 import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.jena.JenaRDF;
 import org.apache.jena.riot.system.StreamRDF;
 import org.trellisldp.vocabulary.ACL;
 import org.trellisldp.vocabulary.RDF;
-import java.io.ByteArrayOutputStream;
-import java.util.Set;
 
 /**
  * @author christopher-johnson
  */
-public class ACLGraph {
+public class ACLStatement {
     private static final JenaRDF rdf = new JenaRDF();
     private final Set<IRI> modes;
     private final IRI agent;
@@ -37,11 +37,11 @@ public class ACLGraph {
     private Graph graph = rdf.createGraph();
 
     /**
-     * @param modes    a {@link Set} of ACL modes
-     * @param agent    a user agent
+     * @param modes a {@link Set} of ACL modes
+     * @param agent a user agent
      * @param accessTo the resource this ACL grants access to
      */
-    public ACLGraph(final Set<IRI> modes, final IRI agent, final IRI accessTo) {
+    public ACLStatement(final Set<IRI> modes, final IRI agent, final IRI accessTo) {
         this.modes = modes;
         this.agent = agent;
         this.accessTo = accessTo;
@@ -61,9 +61,7 @@ public class ACLGraph {
             graph.add(auth, ACL.mode, m);
         });
         stream.start();
-        graph.stream()
-             .map(rdf::asJenaTriple)
-             .forEachOrdered(stream::triple);
+        graph.stream().map(rdf::asJenaTriple).forEachOrdered(stream::triple);
         stream.finish();
         return out;
     }

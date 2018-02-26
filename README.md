@@ -1,9 +1,9 @@
 ## LDP Client
 
-An JDK9 incubator HTTP client for use with the [Trellis Linked Data Platform](https://trellis-ldp.github.io/trellis/apidocs/).
+An JDK incubator HTTP client for use with the [Trellis Linked Data Platform](https://trellis-ldp.github.io/trellis/apidocs/).
 
 ## Requirements
-* JDK 9 or higher
+* JDK 10 or higher
 
 ### Building
     $ gradle processBuildTools

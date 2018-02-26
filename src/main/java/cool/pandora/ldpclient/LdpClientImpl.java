@@ -20,26 +20,28 @@ import static java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME;
 import static java.util.Collections.synchronizedList;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static javax.ws.rs.core.HttpHeaders.ACCEPT;
+import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
+import static javax.ws.rs.core.HttpHeaders.ETAG;
+import static javax.ws.rs.core.HttpHeaders.LINK;
 import static jdk.incubator.http.HttpClient.Version.HTTP_2;
+import static jdk.incubator.http.HttpRequest.BodyPublisher.fromInputStream;
+import static jdk.incubator.http.HttpRequest.BodyPublisher.fromString;
+import static jdk.incubator.http.HttpRequest.BodyPublisher.noBody;
 import static jdk.incubator.http.HttpResponse.BodyHandler.asByteArray;
 import static jdk.incubator.http.HttpResponse.BodyHandler.asFile;
 import static jdk.incubator.http.HttpResponse.BodyHandler.asString;
+import static org.apache.jena.riot.WebContent.contentTypeJSONLD;
+import static org.apache.jena.riot.WebContent.contentTypeNTriples;
+import static org.apache.jena.riot.WebContent.contentTypeSPARQLQuery;
+import static org.apache.jena.riot.WebContent.contentTypeSPARQLUpdate;
 import static org.apache.jena.riot.WebContent.contentTypeTurtle;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import jdk.incubator.http.HttpClient;
-import jdk.incubator.http.HttpRequest;
-import jdk.incubator.http.HttpResponse;
-import org.apache.commons.rdf.api.IRI;
-import org.apache.jena.riot.WebContent;
-import org.slf4j.Logger;
-import org.trellisldp.vocabulary.DC;
-import org.trellisldp.vocabulary.LDP;
-import org.trellisldp.vocabulary.Trellis;
-import javax.net.ssl.SSLContext;
-import javax.ws.rs.core.HttpHeaders;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +51,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+import javax.net.ssl.SSLContext;
+import jdk.incubator.http.HttpClient;
+import jdk.incubator.http.HttpRequest;
+import jdk.incubator.http.HttpResponse;
+import org.apache.commons.rdf.api.IRI;
+import org.slf4j.Logger;
+import org.trellisldp.vocabulary.DC;
+import org.trellisldp.vocabulary.LDP;
+import org.trellisldp.vocabulary.Trellis;
 
 /**
  * LdpClientImpl.
@@ -58,7 +69,6 @@ import java.util.stream.Collectors;
 public class LdpClientImpl implements LdpClient {
     private static final Logger log = getLogger(LdpClientImpl.class);
     private static final String NON_NULL_IDENTIFIER = "Identifier may not be null!";
-    private static SSLContext sslContext;
     private static HttpClient client = null;
 
     private LdpClientImpl(final HttpClient client) {
@@ -73,16 +83,24 @@ public class LdpClientImpl implements LdpClient {
         this(getClient());
     }
 
-    private static HttpClient getClient() {
-        final ExecutorService exec = Executors.newCachedThreadPool();
-        return HttpClient.newBuilder()
-                         .executor(exec)
-                         // .sslContext(sslContext)
-                         .version(HTTP_2)
-                         .build();
+    /**
+     * @param sslContext an {@link SSLContext}
+     */
+    public LdpClientImpl(final SSLContext sslContext) {
+        this(getH2Client(sslContext));
     }
 
-    private static String buildLDFQuery(final String subject, final String predicate, final String object) {
+    static HttpClient getClient() {
+        final ExecutorService exec = Executors.newCachedThreadPool();
+        return HttpClient.newBuilder().executor(exec).build();
+    }
+
+    static HttpClient getH2Client(final SSLContext sslContext) {
+        final ExecutorService exec = Executors.newCachedThreadPool();
+        return HttpClient.newBuilder().executor(exec).sslContext(sslContext).version(HTTP_2).build();
+    }
+
+    static String buildLDFQuery(final String subject, final String predicate, final String object) {
         String sq = "";
         String pq = "";
         String oq = "";
@@ -120,14 +138,11 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .method("HEAD", HttpRequest.noBody())
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).method("HEAD", noBody()).build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " HEAD request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
-            return response.headers()
-                           .map();
+            log.info(String.valueOf(response.version()) + " HEAD request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
+            return response.headers().map();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -138,14 +153,12 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final String[] headers = new String[]{HttpHeaders.ACCEPT, WebContent.contentTypeJSONLD};
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(headers)
-                                               .GET()
-                                               .build();
+            final String[] headers = new String[]{ACCEPT, contentTypeJSONLD};
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(headers).GET().build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
+            log.debug("Response Body: " + response.body());
             return response.body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -157,12 +170,11 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .GET()
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).GET().build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
+            log.debug("Response Body: " + response.body());
             return response.body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -174,13 +186,11 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(HttpHeaders.ACCEPT, contentType)
-                                               .GET()
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(ACCEPT, contentType).GET().build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
+            log.debug("Response Body: " + response.body());
             return response.body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -193,17 +203,12 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final String datetime = RFC_1123_DATE_TIME.withZone(UTC)
-                                                      .format(ofEpochMilli(Long.parseLong(timestamp)));
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers("Accept-Datetime", datetime)
-                                               .GET()
-                                               .build();
+            final String datetime = RFC_1123_DATE_TIME.withZone(UTC).format(ofEpochMilli(Long.parseLong(timestamp)));
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers("Accept-Datetime", datetime).GET().build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
-            return response.headers()
-                           .map();
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
+            return response.headers().map();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -214,12 +219,11 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString() + "?ext=timemap");
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .GET()
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).GET().build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
+            log.debug("Response Body: " + response.body());
             return response.body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -231,15 +235,12 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString() + "?ext=timemap");
-            final String[] headers = new String[]{HttpHeaders.ACCEPT, WebContent.contentTypeJSONLD + "; " +
-                    "profile=\"" + profile + "\""};
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(headers)
-                                               .GET()
-                                               .build();
+            final String[] headers = new String[]{ACCEPT, contentTypeJSONLD + "; " + "profile=\"" + profile + "\""};
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(headers).GET().build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier +
-                    "?ext=timemap", String.valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}",
+                    identifier.getIRIString() + "?ext=timemap", String.valueOf(response.statusCode()));
+            log.debug("Response Body: " + response.body());
             return response.body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -252,15 +253,12 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString() + "?version=" + timestamp);
-            final String[] headers = new String[]{HttpHeaders.ACCEPT, WebContent.contentTypeJSONLD + "; " +
-                    "profile=\"" + profile + "\""};
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(headers)
-                                               .GET()
-                                               .build();
+            final String[] headers = new String[]{ACCEPT, contentTypeJSONLD + "; " + "profile=\"" + profile + "\""};
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(headers).GET().build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier + "?version="
-                    + timestamp, String.valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}",
+                    identifier.getIRIString() + "?version=" + timestamp, String.valueOf(response.statusCode()));
+            log.debug("Response Body: " + response.body());
             return response.body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -272,12 +270,10 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .GET()
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).GET().build();
             final HttpResponse<Path> response = client.send(req, asFile(file));
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
             return response.body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -289,12 +285,11 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .GET()
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).GET().build();
             final HttpResponse<byte[]> response = client.send(req, asByteArray());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
+            log.debug("Response Body: " + new String(response.body(), StandardCharsets.UTF_8));
             return response.body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -306,27 +301,14 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers("Want-Digest", algorithm)
-                                               .method("HEAD", HttpRequest.noBody())
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers("Want-Digest", algorithm).method(
+                    "HEAD", noBody()).build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
-            final List<List<String>> res = response.headers()
-                                                   .map()
-                                                   .entrySet()
-                                                   .stream()
-                                                   .filter(h -> h.getKey()
-                                                                 .equals("digest"))
-                                                   .map(Map.Entry::getValue)
-                                                   .collect(Collectors.toList());
-            return res.stream()
-                      .flatMap(List::stream)
-                      .collect(Collectors.toList())
-                      .stream()
-                      .findAny()
-                      .orElse("");
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
+            final List<List<String>> res = response.headers().map().entrySet().stream().filter(
+                    h -> h.getKey().equals("digest")).map(Map.Entry::getValue).collect(Collectors.toList());
+            return res.stream().flatMap(List::stream).collect(Collectors.toList()).stream().findAny().orElse("");
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -338,12 +320,10 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString() + "?version=" + timestamp);
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .GET()
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).GET().build();
             final HttpResponse<Path> response = client.send(req, asFile(file));
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier + "?version="
-                    + timestamp, String.valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}",
+                    identifier + "?version=" + timestamp, String.valueOf(response.statusCode()));
             return response.body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -355,12 +335,11 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString() + "?version=" + timestamp);
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .GET()
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).GET().build();
             final HttpResponse<byte[]> response = client.send(req, asByteArray());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier + "?version="
-                    + timestamp, String.valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}",
+                    identifier.getIRIString() + "?version=" + timestamp, String.valueOf(response.statusCode()));
+            log.debug("Response Body: " + new String(response.body(), StandardCharsets.UTF_8));
             return response.body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -372,13 +351,10 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers("Range", byterange)
-                                               .GET()
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers("Range", byterange).GET().build();
             final HttpResponse<byte[]> response = client.send(req, asByteArray());
-            log.info(String.valueOf(response.version()));
-            log.info(String.valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier.getIRIString(),
+                    String.valueOf(response.statusCode()));
             return response.body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -390,13 +366,11 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers("Prefer", prefer)
-                                               .GET()
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers("Prefer", prefer).GET().build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
+            log.debug("Response Body: " + response.body());
             return response.body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -408,15 +382,13 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final String[] headers = new String[]{"Prefer", "return=representation; include=\"" + Trellis
-                    .PreferServerManaged.getIRIString() + "\""};
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(headers)
-                                               .GET()
-                                               .build();
+            final String[] headers = new String[]{"Prefer",
+                    "return=representation; include=\"" + Trellis.PreferServerManaged.getIRIString() + "\""};
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(headers).GET().build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
+            log.debug("Response Body: " + response.body());
             return response.body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -428,15 +400,13 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final String[] headers = new String[]{"Prefer", "return=representation; include=\"" + LDP
-                    .PreferMinimalContainer.getIRIString() + "\""};
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(headers)
-                                               .GET()
-                                               .build();
+            final String[] headers = new String[]{"Prefer",
+                    "return=representation; include=\"" + LDP.PreferMinimalContainer.getIRIString() + "\""};
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(headers).GET().build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
+            log.debug("Response Body: " + response.body());
             return response.body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -448,15 +418,12 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final String[] headers = new String[]{HttpHeaders.ACCEPT, WebContent.contentTypeJSONLD + "; " +
-                    "profile=\"" + profile + "\""};
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(headers)
-                                               .GET()
-                                               .build();
+            final String[] headers = new String[]{ACCEPT, contentTypeJSONLD + "; " + "profile=\"" + profile + "\""};
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(headers).GET().build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
+            log.debug("Response Body: " + response.body());
             return response.body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -470,15 +437,12 @@ public class LdpClientImpl implements LdpClient {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final String q = buildLDFQuery(subject, predicate, object);
             final URI uri = new URI(identifier.getIRIString() + q);
-            final String[] headers = new String[]{HttpHeaders.ACCEPT, WebContent.contentTypeJSONLD + "; " +
-                    "profile=\"" + profile + "\""};
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(headers)
-                                               .GET()
-                                               .build();
+            final String[] headers = new String[]{ACCEPT, contentTypeJSONLD + "; profile=\"" + profile + "\""};
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(headers).GET().build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
+            log.debug("Response Body: " + response.body());
             return response.body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -492,13 +456,11 @@ public class LdpClientImpl implements LdpClient {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final String q = buildLDFQuery(subject, predicate, object);
             final URI uri = new URI(identifier.getIRIString() + q);
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(HttpHeaders.ACCEPT, WebContent.contentTypeJSONLD)
-                                               .GET()
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(ACCEPT, contentTypeJSONLD).GET().build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier + q, String
-                    .valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier + q,
+                    String.valueOf(response.statusCode()));
+            log.debug("Response Body: " + response.body());
             return response.body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -511,13 +473,11 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString() + "?ext=acl");
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(HttpHeaders.ACCEPT, contentType)
-                                               .GET()
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(ACCEPT, contentType).GET().build();
             final HttpResponse<String> response = client.send(req, asString());
             log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier + "?ext=acl",
                     String.valueOf(response.statusCode()));
+            log.debug("Response Body: " + response.body());
             return response.body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -531,15 +491,11 @@ public class LdpClientImpl implements LdpClient {
             final URI uri = new URI(identifier.getIRIString());
             final String[] headers = new String[]{"Origin", origin.getIRIString(), "Access-Control-Request-Method",
                     "PUT", "Access-Control-Request-Headers", "Content-Type, Link"};
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(headers)
-                                               .GET()
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(headers).GET().build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
-            return response.headers()
-                           .map();
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
+            return response.headers().map();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -552,15 +508,11 @@ public class LdpClientImpl implements LdpClient {
             final URI uri = new URI(identifier.getIRIString());
             final String[] headers = new String[]{"Origin", origin.getIRIString(), "Access-Control-Request-Method",
                     "POST", "Access-Control-Request-Headers", "Accept"};
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(headers)
-                                               .GET()
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(headers).GET().build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
-            return response.headers()
-                           .map();
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
+            return response.headers().map();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -572,13 +524,11 @@ public class LdpClientImpl implements LdpClient {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
             final String[] entries = buildHeaderEntryList(metadata);
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(entries)
-                                               .GET()
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(entries).GET().build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
+            log.debug("Response Body: " + response.body());
             return response.body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -592,13 +542,10 @@ public class LdpClientImpl implements LdpClient {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
             final String[] entries = buildHeaderEntryList(metadata);
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(entries)
-                                               .GET()
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(entries).GET().build();
             final HttpResponse<byte[]> response = client.send(req, asByteArray());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
             return response.body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -612,16 +559,12 @@ public class LdpClientImpl implements LdpClient {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
             final String[] entries = buildHeaderEntryList(metadata);
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(entries)
-                                               .GET()
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(entries).GET().build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
             final Map<String, Map<String, List<String>>> res = new HashMap<>();
-            res.put(response.body(), response.headers()
-                                             .map());
+            res.put(response.body(), response.headers().map());
             return res;
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -633,14 +576,11 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .method("OPTIONS", HttpRequest.noBody())
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).method("OPTIONS", noBody()).build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " OPTIONS request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
-            return response.headers()
-                           .map();
+            log.info(String.valueOf(response.version()) + " OPTIONS request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
+            return response.headers().map();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -652,16 +592,12 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(HttpHeaders.CONTENT_TYPE, contentType)
-                                               .POST(HttpRequest.BodyProcessor.fromInputStream(() -> stream))
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(CONTENT_TYPE, contentType).POST(
+                    fromInputStream(() -> stream)).build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info("New Resource Location {}", String.valueOf(response.headers()
-                                                                        .map()
-                                                                        .get("Location")));
-            log.info(String.valueOf(response.version()) + " POST request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info("New Resource Location {}", String.valueOf(response.headers().map().get("Location")));
+            log.info(String.valueOf(response.version()) + " POST request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -674,16 +610,12 @@ public class LdpClientImpl implements LdpClient {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
             final String[] entries = buildHeaderEntryList(metadata);
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(entries)
-                                               .POST(HttpRequest.BodyProcessor.fromInputStream(() -> stream))
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(entries).POST(
+                    fromInputStream(() -> stream)).build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info("New Resource Location {}", String.valueOf(response.headers()
-                                                                        .map()
-                                                                        .get("Location")));
-            log.info(String.valueOf(response.version()) + " POST request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info("New Resource Location {}", String.valueOf(response.headers().map().get("Location")));
+            log.info(String.valueOf(response.version()) + " POST request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -695,15 +627,11 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(HttpHeaders.CONTENT_TYPE, contentType, HttpHeaders
-                                                       .AUTHORIZATION, authorization)
-                                               .POST(HttpRequest.BodyProcessor.fromInputStream(() -> stream))
-                                               .build();
+            final String[] headers = new String[]{CONTENT_TYPE, contentType, AUTHORIZATION, authorization};
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(headers).POST(
+                    fromInputStream(() -> stream)).build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info("New Resource Location {}", String.valueOf(response.headers()
-                                                                        .map()
-                                                                        .get("Location")));
+            log.info("New Resource Location {}", String.valueOf(response.headers().map().get("Location")));
             log.info(String.valueOf(response.version()) + " AUTHORIZED POST request to {} returned {}", identifier,
                     String.valueOf(response.statusCode()));
         } catch (Exception ex) {
@@ -717,16 +645,12 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(HttpHeaders.CONTENT_TYPE, contentType, "Slug", slug)
-                                               .POST(HttpRequest.BodyProcessor.fromInputStream(() -> stream))
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(CONTENT_TYPE, contentType, "Slug", slug).POST(
+                    fromInputStream(() -> stream)).build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info("New Resource Location {}", String.valueOf(response.headers()
-                                                                        .map()
-                                                                        .get("Location")));
-            log.info(String.valueOf(response.version()) + " POST request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info("New Resource Location {}", String.valueOf(response.headers().map().get("Location")));
+            log.info(String.valueOf(response.version()) + " POST request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -738,16 +662,12 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(HttpHeaders.CONTENT_TYPE, contentType, "Digest", digest)
-                                               .POST(HttpRequest.BodyProcessor.fromInputStream(() -> stream))
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(
+                    CONTENT_TYPE, contentType, "Digest", digest).POST(fromInputStream(() -> stream)).build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info("New Resource Location {}", String.valueOf(response.headers()
-                                                                        .map()
-                                                                        .get("Location")));
-            log.info(String.valueOf(response.version()) + " POST request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info("New Resource Location {}", String.valueOf(response.headers().map().get("Location")));
+            log.info(String.valueOf(response.version()) + " POST request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -758,13 +678,12 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final String entity = "<> " + LDP.hasMemberRelation + " " + DC.isPartOf + " ;\n" + LDP.membershipResource
-                    + " " + membershipObj;
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(HttpHeaders.CONTENT_TYPE, contentTypeTurtle, "Slug", slug,
-                                                       HttpHeaders.LINK, LDP.DirectContainer + "; rel=\"type\"")
-                                               .POST(HttpRequest.BodyProcessor.fromString(entity))
-                                               .build();
+            final String[] headers = new String[]{CONTENT_TYPE, contentTypeTurtle, "Slug", slug, LINK,
+                    LDP.DirectContainer + "; rel=\"type\""};
+            final String entity =
+                    "<> " + LDP.hasMemberRelation + " " + DC.isPartOf + " ;\n" + LDP.membershipResource + " "
+                            + membershipObj;
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(headers).POST(fromString(entity)).build();
             final HttpResponse<String> response = client.send(req, asString());
             log.info(String.valueOf(response.version()) + " POST create LDP-DC request to {} returned {}", uri,
                     String.valueOf(response.statusCode()));
@@ -779,17 +698,15 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final String[] headers = new String[]{HttpHeaders.CONTENT_TYPE, contentTypeTurtle, "Slug", slug,
-                    HttpHeaders.LINK, LDP.DirectContainer + "; rel=\"type\"", HttpHeaders.AUTHORIZATION, authorization};
-            final String entity = "<> " + LDP.hasMemberRelation + " " + DC.isPartOf + " ;\n" + LDP.membershipResource
-                    + " " + membershipObj;
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(headers)
-                                               .POST(HttpRequest.BodyProcessor.fromString(entity))
-                                               .build();
+            final String[] headers = new String[]{CONTENT_TYPE, contentTypeTurtle, "Slug", slug, LINK,
+                    LDP.DirectContainer + "; rel=\"type\"", AUTHORIZATION, authorization};
+            final String entity =
+                    "<> " + LDP.hasMemberRelation + " " + DC.isPartOf + " ;\n" + LDP.membershipResource + " "
+                            + membershipObj;
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(headers).POST(fromString(entity)).build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " POST create LDP-DC request to {} returned {}", uri,
-                    String.valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " AUTHORIZED POST create LDP-DC request to {} returned {}",
+                    uri, String.valueOf(response.statusCode()));
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -801,13 +718,11 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(HttpHeaders.CONTENT_TYPE, contentType)
-                                               .PUT(HttpRequest.BodyProcessor.fromInputStream(() -> stream))
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(CONTENT_TYPE, contentType).PUT(
+                    fromInputStream(() -> stream)).build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " PUT request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " PUT request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -820,13 +735,11 @@ public class LdpClientImpl implements LdpClient {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
             final String[] entries = buildHeaderEntryList(metadata);
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(entries)
-                                               .PUT(HttpRequest.BodyProcessor.fromInputStream(() -> stream))
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(entries).PUT(
+                    fromInputStream(() -> stream)).build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " PUT request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " PUT request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -838,11 +751,8 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(HttpHeaders.CONTENT_TYPE, contentType, HttpHeaders
-                                                       .AUTHORIZATION, authorization)
-                                               .PUT(HttpRequest.BodyProcessor.fromInputStream(() -> stream))
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(
+                    CONTENT_TYPE, contentType, AUTHORIZATION, authorization).PUT(fromInputStream(() -> stream)).build();
             final HttpResponse<String> response = client.send(req, asString());
             log.info(String.valueOf(response.version()) + " AUTHORIZED PUT request to {} returned {}", identifier,
                     String.valueOf(response.statusCode()));
@@ -857,13 +767,11 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(HttpHeaders.CONTENT_TYPE, contentType, HttpHeaders.ETAG, etag)
-                                               .PUT(HttpRequest.BodyProcessor.fromInputStream(() -> stream))
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(CONTENT_TYPE, contentType, ETAG, etag).PUT(
+                    fromInputStream(() -> stream)).build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " PUT request with matching Etag {} to {} returned {}",
-                    etag, identifier, String.valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " PUT request with matching Etag {} to {} returned {}", etag,
+                    identifier, String.valueOf(response.statusCode()));
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -875,13 +783,11 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(HttpHeaders.CONTENT_TYPE, contentType, "Digest", digest)
-                                               .PUT(HttpRequest.BodyProcessor.fromInputStream(() -> stream))
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(
+                    CONTENT_TYPE, contentType, "Digest", digest).PUT(fromInputStream(() -> stream)).build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " PUT request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " PUT request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -893,14 +799,11 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(HttpHeaders.CONTENT_TYPE, contentType, "If-Unmodified-Since",
-                                                       time)
-                                               .PUT(HttpRequest.BodyProcessor.fromInputStream(() -> stream))
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(
+                    CONTENT_TYPE, contentType, "If-Unmodified-Since", time).PUT(fromInputStream(() -> stream)).build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " PUT request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " PUT request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -911,12 +814,10 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .DELETE(HttpRequest.noBody())
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).DELETE(noBody()).build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " DELETE request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " DELETE request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -927,13 +828,11 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .header(HttpHeaders.CONTENT_TYPE, WebContent.contentTypeSPARQLUpdate)
-                                               .method("PATCH", HttpRequest.BodyProcessor.fromInputStream(() -> stream))
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).header(CONTENT_TYPE, contentTypeSPARQLUpdate).method(
+                    "PATCH", fromInputStream(() -> stream)).build();
             final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " PATCH request to {} returned {}", identifier, String
-                    .valueOf(response.statusCode()));
+            log.info(String.valueOf(response.version()) + " PATCH request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -974,10 +873,8 @@ public class LdpClientImpl implements LdpClient {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(HttpHeaders.CONTENT_TYPE, WebContent.contentTypeNTriples)
-                                               .PUT(HttpRequest.BodyProcessor.fromInputStream(() -> stream))
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(CONTENT_TYPE, contentTypeNTriples).PUT(
+                    fromInputStream(() -> stream)).build();
             final CompletableFuture<HttpResponse<String>> response = client.sendAsync(req, asString());
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -985,18 +882,15 @@ public class LdpClientImpl implements LdpClient {
     }
 
     /**
-     * @param query       a complete formatted URI string
+     * @param query a complete formatted URI string
      * @param contentType content Type as a {@link String}
      * @return body as byte[]
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
     public byte[] getBytesWithQuery(final String query, final String contentType) throws LdpClientException {
         try {
-            final HttpRequest req = HttpRequest.newBuilder(new URI(query))
-                                               .headers(HttpHeaders.CONTENT_TYPE, WebContent.contentTypeSPARQLQuery,
-                                                       HttpHeaders.ACCEPT, contentType)
-                                               .GET()
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(new URI(query)).headers(
+                    CONTENT_TYPE, contentTypeSPARQLQuery, ACCEPT, contentType).GET().build();
             final HttpResponse<byte[]> response = client.send(req, asByteArray());
 
             log.info(String.valueOf(response.version()));
@@ -1008,18 +902,15 @@ public class LdpClientImpl implements LdpClient {
     }
 
     /**
-     * @param query       a complete formatted URI string
+     * @param query a complete formatted URI string
      * @param contentType content Type as a {@link String}
      * @return body as {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
     public String getQuery(final String query, final String contentType) throws LdpClientException {
         try {
-            final HttpRequest req = HttpRequest.newBuilder(new URI(query))
-                                               .headers(HttpHeaders.CONTENT_TYPE, WebContent.contentTypeSPARQLQuery,
-                                                       HttpHeaders.ACCEPT, contentType)
-                                               .GET()
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(new URI(query)).headers(
+                    CONTENT_TYPE, contentTypeSPARQLQuery, ACCEPT, contentType).GET().build();
             final HttpResponse<String> response = client.send(req, asString());
 
             log.info(String.valueOf(response.version()));
@@ -1031,52 +922,38 @@ public class LdpClientImpl implements LdpClient {
     }
 
     /**
-     * @param query       a complete formatted URI string
+     * @param query a complete formatted URI string
      * @param contentType content Type as a {@link String}
      * @return body as byte[]
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
     public byte[] asyncGetBytesWithQuery(final String query, final String contentType) throws LdpClientException {
         try {
-            final HttpRequest req = HttpRequest.newBuilder()
-                                               .uri(new URI(query))
-                                               .headers(HttpHeaders.CONTENT_TYPE, WebContent.contentTypeSPARQLQuery,
-                                                       HttpHeaders.ACCEPT, contentType)
-                                               .GET()
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder().uri(new URI(query)).headers(
+                    CONTENT_TYPE, contentTypeSPARQLQuery, ACCEPT, contentType).GET().build();
             final CompletableFuture<HttpResponse<byte[]>> response = client.sendAsync(req, asByteArray());
-            log.info(String.valueOf(response.get()
-                                            .version()));
-            log.info(String.valueOf(response.get()
-                                            .statusCode()));
-            return response.get()
-                           .body();
+            log.info(String.valueOf(response.get().version()));
+            log.info(String.valueOf(response.get().statusCode()));
+            return response.get().body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
     }
 
     /**
-     * @param query       a complete formatted URI string
+     * @param query a complete formatted URI string
      * @param contentType content Type as a {@link String}
      * @return body as {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
     public String asyncGetQuery(final String query, final String contentType) throws LdpClientException {
         try {
-            final HttpRequest req = HttpRequest.newBuilder()
-                                               .uri(new URI(query))
-                                               .headers(HttpHeaders.CONTENT_TYPE, WebContent.contentTypeSPARQLQuery,
-                                                       HttpHeaders.ACCEPT, contentType)
-                                               .GET()
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder().uri(new URI(query)).headers(
+                    CONTENT_TYPE, contentTypeSPARQLQuery, ACCEPT, contentType).GET().build();
             final CompletableFuture<HttpResponse<String>> response = client.sendAsync(req, asString());
-            log.info(String.valueOf(response.get()
-                                            .version()));
-            log.info(String.valueOf(response.get()
-                                            .statusCode()));
-            return response.get()
-                           .body();
+            log.info(String.valueOf(response.get().version()));
+            log.info(String.valueOf(response.get().statusCode()));
+            return response.get().body();
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -1084,7 +961,7 @@ public class LdpClientImpl implements LdpClient {
 
     /**
      * @param identifier a sparql interface
-     * @param query      a sparql query body
+     * @param query a sparql query body
      * @return body as {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
@@ -1093,10 +970,8 @@ public class LdpClientImpl implements LdpClient {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
             final URI uri = new URI(identifier.getIRIString());
             final String formdata = "update=" + query;
-            final HttpRequest req = HttpRequest.newBuilder(uri)
-                                               .headers(HttpHeaders.CONTENT_TYPE, WebContent.contentTypeSPARQLQuery)
-                                               .POST(HttpRequest.BodyProcessor.fromString(formdata))
-                                               .build();
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(CONTENT_TYPE, contentTypeSPARQLQuery).POST(
+                    fromString(formdata)).build();
             final HttpResponse<String> response = client.send(req, asString());
             log.info(String.valueOf(response.version()));
             log.info(String.valueOf(response.statusCode()));

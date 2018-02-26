@@ -14,19 +14,19 @@
 
 package cool.pandora.ldpclient;
 
-import org.apache.commons.rdf.api.IRI;
-import org.apache.commons.rdf.jena.JenaRDF;
-import org.junit.jupiter.api.Test;
-import org.trellisldp.vocabulary.ACL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import org.apache.commons.rdf.api.IRI;
+import org.apache.commons.rdf.jena.JenaRDF;
+import org.junit.jupiter.api.Test;
+import org.trellisldp.vocabulary.ACL;
 
 /**
  * @author christopher-johnson
  */
-class ACLGraphTest {
+class ACLStatementTest {
     private static final Set<IRI> allModes = new HashSet<>();
     private static final JenaRDF rdf = new JenaRDF();
 
@@ -38,16 +38,14 @@ class ACLGraphTest {
     }
 
     private final String baseURL = "http://localhost/";
-    private final String pid = "ldp-test-" + UUID.randomUUID()
-                                                 .toString();
+    private final String pid = "ldp-test-" + UUID.randomUUID().toString();
 
     @Test
     void getACL() {
         final IRI agent = rdf.createIRI("http://localhost/test-user");
         final IRI accessTo = rdf.createIRI(baseURL + pid);
-        final ACLGraph acl = new ACLGraph(allModes, agent, accessTo);
-        final String text = new String(acl.getACL()
-                                          .toByteArray(), StandardCharsets.UTF_8);
+        final ACLStatement acl = new ACLStatement(allModes, agent, accessTo);
+        final String text = new String(acl.getACL().toByteArray(), StandardCharsets.UTF_8);
 
     }
 }

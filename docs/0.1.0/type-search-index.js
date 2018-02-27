@@ -1,1 +1,0 @@
-typeSearchIndex = [{"p":"cool.pandora.ldpclient","l":"ACLStatement"},{"p":"cool.pandora.ldpclient","l":"LdpClient"},{"p":"cool.pandora.ldpclient","l":"LdpClientException"},{"p":"cool.pandora.ldpclient","l":"LdpClientImpl"},{"p":"cool.pandora.ldpclient","l":"SimpleSSLContext"}]

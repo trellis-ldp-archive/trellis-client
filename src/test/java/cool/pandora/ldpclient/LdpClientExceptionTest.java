@@ -78,7 +78,6 @@ class LdpClientExceptionTest {
         assertThrows(LdpClientException.class, () -> client.getBinaryVersion(identifier, null, null));
         assertThrows(LdpClientException.class, () -> client.getRange(identifier, null));
         assertThrows(LdpClientException.class, () -> client.getPrefer(identifier, null));
-        assertThrows(LdpClientException.class, () -> client.getPreferServerManaged(identifier));
         assertThrows(LdpClientException.class, () -> client.getPreferMinimal(identifier));
         assertThrows(LdpClientException.class, () -> client.getJsonProfile(identifier, null));
         assertThrows(LdpClientException.class, () -> client.getJsonProfileLDF(identifier, null, null, null, null));
@@ -98,6 +97,7 @@ class LdpClientExceptionTest {
         assertThrows(LdpClientException.class, () -> client.newLdpDc(identifier, null, null));
         assertThrows(LdpClientException.class, () -> client.newLdpDcWithAuth(identifier, null, null, null));
         assertThrows(LdpClientException.class, () -> client.put(identifier, null, null));
+        assertThrows(LdpClientException.class, () -> client.putWithResponse(identifier, null, null));
         assertThrows(LdpClientException.class, () -> client.putWithMetadata(identifier, null, null));
         assertThrows(LdpClientException.class, () -> client.putWithAuth(identifier, null, null, null));
         assertThrows(LdpClientException.class, () -> client.putIfMatch(identifier, null, null, null));

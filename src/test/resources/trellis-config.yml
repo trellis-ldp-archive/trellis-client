@@ -52,4 +52,4 @@ jsonld:
     cacheExpireHours: 48
     contextDomainWhitelist:
         - https://www.trellisldp.org/
-    contextWhitelist: []
+    contextWhitelist: ["http://www.w3.org/ns/anno.jsonld"]

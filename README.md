@@ -1,9 +1,11 @@
 ## LDP Client
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/cool.pandora/ldp-client/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cool.pandora/ldp-client)
+
 An JDK incubator HTTP client for use with the [Trellis Linked Data Platform](https://trellis-ldp.github.io/trellis/apidocs/).
 
 ## Requirements
-* JDK 10 or higher
+* [JDK 10](http://jdk.java.net/10/) or higher
 
 ### Building
     $ gradle processBuildTools

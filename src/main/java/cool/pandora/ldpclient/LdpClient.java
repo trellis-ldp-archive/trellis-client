@@ -153,13 +153,6 @@ public interface LdpClient {
      * @return body as a {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
-    String getPreferServerManaged(IRI identifier) throws LdpClientException;
-
-    /**
-     * @param identifier a resource identifier
-     * @return body as a {@link String}
-     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
-     */
     String getPreferMinimal(IRI identifier) throws LdpClientException;
 
     /**
@@ -324,6 +317,16 @@ public interface LdpClient {
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
     void put(final IRI identifier, final InputStream stream, final String contentType) throws LdpClientException;
+
+    /**
+     * @param identifier a resource identifier
+     * @param stream an {@link InputStream}
+     * @param contentType a content type
+     * @return status a {@link Boolean}
+     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+     */
+    Boolean putWithResponse(final IRI identifier, final InputStream stream, final String contentType) throws
+            LdpClientException;
 
     /**
      * @param identifier a resource identifier

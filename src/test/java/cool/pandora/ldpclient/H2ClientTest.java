@@ -17,12 +17,14 @@ package cool.pandora.ldpclient;
 import static io.dropwizard.testing.ConfigOverride.config;
 import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
 import static javax.ws.rs.core.HttpHeaders.LINK;
+import static org.apache.jena.riot.WebContent.contentTypeJSONLD;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.dropwizard.testing.DropwizardTestSupport;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import javax.net.ssl.SSLContext;
 import org.apache.commons.rdf.api.IRI;
@@ -49,12 +51,19 @@ public class H2ClientTest {
     private static final JenaRDF rdf = new JenaRDF();
     private static String baseUrl;
     private static String pid;
-    private static SSLContext sslContext;
+    private static LdpClient h2client = null;
 
     @BeforeAll
     static void initAll() {
         APP.before();
         baseUrl = "https://localhost:8445/";
+        try {
+            final SimpleSSLContext sslct = new SimpleSSLContext();
+            final SSLContext sslContext = sslct.get();
+            h2client = new LdpClientImpl(sslContext);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @AfterAll
@@ -71,19 +80,19 @@ public class H2ClientTest {
     void tearDown() {
     }
 
+    private static InputStream getTestJsonResource() {
+        return LdpClientTest.class.getResourceAsStream("/webanno.complete.json");
+    }
+
     @Test
-    void testGetH2Head() throws Exception {
+    void testGetH2Resource() throws Exception {
         try {
-            final IRI identifier = rdf.createIRI(Objects.requireNonNull(baseUrl));
-            final SimpleSSLContext sslct = new SimpleSSLContext();
-            sslContext = sslct.get();
-            final LdpClient h2client = new LdpClientImpl(sslContext);
+            final IRI identifier = rdf.createIRI(baseUrl + pid);
+            h2client.put(identifier, getTestJsonResource(), contentTypeJSONLD);
             final Map<String, List<String>> headers = h2client.head(identifier);
             assertTrue(headers.containsKey(LINK));
-        } catch (Throwable e) {
-            System.err.println("Throwing now");
-            e.printStackTrace();
-            throw e;
+        } catch (Exception ex) {
+            throw new LdpClientException(ex.toString(), ex.getCause());
         }
     }
 

@@ -59,7 +59,6 @@ import org.apache.commons.rdf.api.IRI;
 import org.slf4j.Logger;
 import org.trellisldp.vocabulary.DC;
 import org.trellisldp.vocabulary.LDP;
-import org.trellisldp.vocabulary.Trellis;
 
 /**
  * LdpClientImpl.
@@ -378,24 +377,6 @@ public class LdpClientImpl implements LdpClient {
     }
 
     @Override
-    public String getPreferServerManaged(final IRI identifier) throws LdpClientException {
-        try {
-            requireNonNull(identifier, NON_NULL_IDENTIFIER);
-            final URI uri = new URI(identifier.getIRIString());
-            final String[] headers = new String[]{"Prefer",
-                    "return=representation; include=\"" + Trellis.PreferServerManaged.getIRIString() + "\""};
-            final HttpRequest req = HttpRequest.newBuilder(uri).headers(headers).GET().build();
-            final HttpResponse<String> response = client.send(req, asString());
-            log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier,
-                    String.valueOf(response.statusCode()));
-            log.debug("Response Body: " + response.body());
-            return response.body();
-        } catch (Exception ex) {
-            throw new LdpClientException(ex.toString(), ex.getCause());
-        }
-    }
-
-    @Override
     public String getPreferMinimal(final IRI identifier) throws LdpClientException {
         try {
             requireNonNull(identifier, NON_NULL_IDENTIFIER);
@@ -563,6 +544,7 @@ public class LdpClientImpl implements LdpClient {
             final HttpResponse<String> response = client.send(req, asString());
             log.info(String.valueOf(response.version()) + " GET request to {} returned {}", identifier,
                     String.valueOf(response.statusCode()));
+            log.debug("Response Body: " + response.body());
             final Map<String, Map<String, List<String>>> res = new HashMap<>();
             res.put(response.body(), response.headers().map());
             return res;
@@ -723,6 +705,23 @@ public class LdpClientImpl implements LdpClient {
             final HttpResponse<String> response = client.send(req, asString());
             log.info(String.valueOf(response.version()) + " PUT request to {} returned {}", identifier,
                     String.valueOf(response.statusCode()));
+        } catch (Exception ex) {
+            throw new LdpClientException(ex.toString(), ex.getCause());
+        }
+    }
+
+    @Override
+    public Boolean putWithResponse(final IRI identifier, final InputStream stream, final String contentType) throws
+            LdpClientException {
+        try {
+            requireNonNull(identifier, NON_NULL_IDENTIFIER);
+            final URI uri = new URI(identifier.getIRIString());
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(CONTENT_TYPE, contentType).PUT(
+                    fromInputStream(() -> stream)).build();
+            final HttpResponse<String> response = client.send(req, asString());
+            log.info(String.valueOf(response.version()) + " PUT request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
+            return response.statusCode() == 204;
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }

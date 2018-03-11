@@ -1,0 +1,23 @@
+{
+  "@context": ["http://www.w3.org/ns/anno.jsonld",
+    "http://iiif.io/api/presentation/2/context.json"
+  ],
+  "id": "http://workspaces.ub.uni-leipzig.de:8080/repository/node/collection/vp/anno/05ac4b43-daf6-4772-b78d-401aa2727e5e2eecbc8b-38a2-49d8-9307-251177934542",
+  "type": "Annotation",
+  "motivation": "painting",
+  "body": {
+    "id": "http://workspaces.ub.uni-leipzig.de:8080/repository/node/collection/vp/res/05ac4b43-daf6-4772-b78d-401aa2727e5e965bae89-182a-44c7-ab79-5d657cd3146c",
+    "type": "Image",
+    "format": "image/tiff",
+    "service": [
+      {
+        "id": "https://iiif.ub.uni-leipzig.de/05ac4b43-daf6-4772-b78d-401aa2727e5e965bae89-182a-44c7-ab79-5d657cd3146c",
+        "type": "ImageService3",
+        "profile": "level2"
+      }
+    ],
+    "height": 2000,
+    "width": 1500
+  },
+  "target": "http://workspaces.ub.uni-leipzig.de:8080/repository/node/collection/vp/canvas/05ac4b43-daf6-4772-b78d-401aa2727e5e0b97557d-9eca-48ab-9110-f6b1134424d6"
+}

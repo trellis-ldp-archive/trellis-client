@@ -152,30 +152,35 @@ nexus {
 }
 
 javaModule.name = 'cool.pandora.ldpclient'
-javaModule.patchModules 'org.slf4j:log4j.over.slf4j': 'log4j:log4j'
-javaModule.patchModules 'org.apache.httpcomponents:httpclient-osgi': 'commons-codec:commons-codec'
-javaModule.patchModules 'javax.inject:javax.inject': 'org.apache.servicemix.bundles:org.apache.servicemix.bundles' +
+javaModule.patchModules 'com.google.code.findbugs:jsr305':'javax.annotation:jsr250-api'
+javaModule.patchModules 'javax.annotation:javax.annotation-api':'org.apache.geronimo.specs:geronimo-annotation_1.2_spec'
+javaModule.patchModules 'javax.inject:javax.inject':'org.apache.servicemix.bundles:org.apache.servicemix.bundles' +
         '.javax-inject'
-javaModule.patchModules 'com.google.code.findbugs:jsr305': 'javax.annotation:jsr250-api'
-javaModule.patchModules 'xerces:xercesImpl': 'org.apache.servicemix.bundles:org.apache.servicemix.bundles.xerces'
-javaModule.patchModules 'org.apache.httpcomponents:httpcore': 'org.apache.httpcomponents:httpcore-osgi'
-javaModule.patchModules 'org.apache.jena:jena-shaded-guava': 'org.apache.jena:jena-osgi'
-javaModule.patchModules 'org.apache.jena:jena-core': 'org.apache.jena:jena-osgi'
-javaModule.patchModules 'org.apache.jena:jena-arq': 'org.apache.jena:jena-osgi'
-javaModule.patchModules 'org.apache.geronimo.specs:geronimo-jms_1.1_spec': 'javax.jms:javax.jms-api'
-javaModule.patchModules 'xml-apis:xml-apis': 'xerces:xercesImpl'
+javaModule.patchModules 'org.apache.geronimo.specs:geronimo-jms_1.1_spec':'javax.jms:javax.jms-api'
+javaModule.patchModules 'org.apache.httpcomponents:httpclient-osgi':'commons-codec:commons-codec'
+javaModule.patchModules 'org.apache.httpcomponents:httpcore':'org.apache.httpcomponents:httpcore-osgi'
+javaModule.patchModules 'org.apache.jena:jena-arq':'org.apache.jena:jena-osgi'
+javaModule.patchModules 'org.apache.jena:jena-core':'org.apache.jena:jena-osgi'
+javaModule.patchModules 'org.apache.jena:jena-shaded-guava':'org.apache.jena:jena-osgi'
+javaModule.patchModules 'org.eclipse.jetty.alpn:alpn-api':'org.mortbay.jetty.alpn:alpn-boot'
+javaModule.patchModules 'org.slf4j:log4j.over.slf4j':'log4j:log4j'
+javaModule.patchModules 'xerces:xercesImpl':'org.apache.servicemix.bundles:org.apache.servicemix.bundles.xerces'
+javaModule.patchModules 'xml-apis:xml-apis':'xerces:xercesImpl'
 
 dependencies {
-    patch 'log4j:log4j:1.2.17'
+
     patch 'commons-codec:commons-codec:1.11'
-    patch 'org.apache.servicemix.bundles:org.apache.servicemix.bundles.javax-inject:1_2'
     patch 'com.google.code.findbugs:jsr305:3.0.2'
+    patch 'log4j:log4j:1.2.17'
+    patch 'org.apache.geronimo.specs:geronimo-annotation_1.2_spec:1.0-alpha-1'
+    patch 'org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1.1'
+    patch 'org.apache.servicemix.bundles:org.apache.servicemix.bundles.javax-inject:1_2'
     patch 'org.apache.servicemix.bundles:org.apache.servicemix.bundles.xerces:2.11.0_1'
     patch 'org.apache.httpcomponents:httpcore:4.4.6'
     patch 'org.apache.jena:jena-shaded-guava:3.6.0'
     patch 'org.apache.jena:jena-core:3.6.0'
     patch 'org.apache.jena:jena-arq:3.6.0'
-    patch 'org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1.1'
+    patch 'org.mortbay.jetty.alpn:alpn-boot:8.1.12.v20180117'
     patch 'xml-apis:xml-apis:1.4.01'
 
     compile group: 'org.apache.commons', name: 'commons-rdf-jena', version: commonsRdfVersion

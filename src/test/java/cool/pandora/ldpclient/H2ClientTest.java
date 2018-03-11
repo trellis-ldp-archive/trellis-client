@@ -55,7 +55,7 @@ public class H2ClientTest {
 
     @BeforeAll
     static void initAll() {
-        APP.before();
+       // APP.before();
         baseUrl = "https://localhost:8445/";
         try {
             final SimpleSSLContext sslct = new SimpleSSLContext();
@@ -68,7 +68,8 @@ public class H2ClientTest {
 
     @AfterAll
     static void tearDownAll() {
-        APP.after();
+
+        //APP.after();
     }
 
     @BeforeEach
@@ -81,7 +82,7 @@ public class H2ClientTest {
     }
 
     private static InputStream getTestJsonResource() {
-        return LdpClientTest.class.getResourceAsStream("/webanno.complete.json");
+        return LdpClientTest.class.getResourceAsStream("/iiif3-canvas.json");
     }
 
     @Test

@@ -1,0 +1,32 @@
+{
+  "@context": ["http://www.w3.org/ns/anno.jsonld",
+    "http://iiif.io/api/presentation/2/context.json"
+  ],
+  "id": "http://workspaces.ub.uni-leipzig.de:8080/repository/node/collection/vp/canvas/05ac4b43-daf6-4772-b78d-401aa2727e5e0b97557d-9eca-48ab-9110-f6b1134424d6",
+  "type": "sc:Canvas",
+  "metadata": [
+    {
+      "label": "Date",
+      "value": "1974 / 1975"
+    },
+    {
+      "label": "tag",
+      "value": "Institute und sonstige universitäre Einrichtungen"
+    },
+    {
+      "label": "tag",
+      "value": "Institut f. internationale Studien"
+    },
+    {
+      "label": "tag",
+      "value": "1957 - 1975"
+    },
+    {
+      "label": "tag",
+      "value": "Personal- und Vorlesungsverzeichnisse 1935 - 1975"
+    }
+  ],
+  "label": "52140",
+  "height": 1000,
+  "width": 750
+}

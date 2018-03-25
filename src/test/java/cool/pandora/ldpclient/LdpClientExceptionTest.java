@@ -23,6 +23,8 @@ import org.apache.commons.rdf.jena.JenaRDF;
 import org.junit.jupiter.api.Test;
 
 /**
+ * LdpClientExceptionTest.
+ *
  * @author christopher-johnson
  */
 class LdpClientExceptionTest {

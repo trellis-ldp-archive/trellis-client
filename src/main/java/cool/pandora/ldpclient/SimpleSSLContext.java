@@ -28,6 +28,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
 /**
+ * SimpleSSLContext.
+ *
  * @author christopher-johnson
  */
 public class SimpleSSLContext {
@@ -35,8 +37,7 @@ public class SimpleSSLContext {
     SSLContext ssl;
 
     /**
-     * loads default keystore from SimpleSSLContext
-     * source directory
+     * loads default keystore from SimpleSSLContext source directory.
      *
      * @throws IOException ioexception
      */
@@ -45,7 +46,7 @@ public class SimpleSSLContext {
     }
 
     /**
-     * loads default keystore from given directory
+     * loads default keystore from given directory.
      *
      * @param dir a directory string
      * @throws IOException ioexception
@@ -71,13 +72,15 @@ public class SimpleSSLContext {
 
             ssl = SSLContext.getInstance("TLS");
             ssl.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
-        } catch (KeyManagementException | KeyStoreException | UnrecoverableKeyException | CertificateException |
-                NoSuchAlgorithmException e) {
+        } catch (KeyManagementException | KeyStoreException | UnrecoverableKeyException | CertificateException
+                | NoSuchAlgorithmException e) {
             throw new RuntimeException(e.getMessage());
         }
     }
 
     /**
+     * get.
+     *
      * @return SSLContext
      */
     public SSLContext get() {

@@ -15,6 +15,8 @@
 package cool.pandora.ldpclient;
 
 /**
+ * IntegrationTestCategory.
+ *
  * @author christopher-johnson
  */
 interface IntegrationTestCategory {

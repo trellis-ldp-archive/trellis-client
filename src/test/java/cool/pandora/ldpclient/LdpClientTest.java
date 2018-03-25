@@ -64,6 +64,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.trellisldp.app.TrellisApplication;
 import org.trellisldp.app.config.TrellisConfiguration;
@@ -118,7 +119,11 @@ class LdpClientTest {
     }
 
     private static InputStream getTestJsonResource() {
-        return LdpClientTest.class.getResourceAsStream("/webanno.complete.json");
+        return LdpClientTest.class.getResourceAsStream("/webanno.complete-embedded.json");
+    }
+
+    private static InputStream getTestN3Resource() {
+        return LdpClientTest.class.getResourceAsStream("/webanno.complete.nt");
     }
 
     private static InputStream getRevisedTestResource() {
@@ -762,4 +767,15 @@ class LdpClientTest {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
     }
+
+    @RepeatedTest(80)
+    void testRepeatedH1Put() throws LdpClientException {
+        try {
+            final IRI identifier = rdf.createIRI(baseUrl + pid);
+            client.put(identifier, getTestJsonResource(), contentTypeJSONLD);
+        } catch (Exception ex) {
+            throw new LdpClientException(ex.toString(), ex.getCause());
+        }
+    }
+
 }

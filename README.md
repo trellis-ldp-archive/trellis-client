@@ -1,6 +1,9 @@
 ## LDP Client
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/cool.pandora/ldp-client/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cool.pandora/ldp-client)
+[![Build Status](https://travis-ci.org/pan-dora/ldp-client.png?branch=master)](https://travis-ci.org/pan-dora/ldp-client)
+
+![Maven Central](https://img.shields.io/maven-central/v/cool.pandora/ldp-client.svg)
+
 
 An JDK incubator HTTP client for use with the [Trellis Linked Data Platform](https://trellis-ldp.github.io/trellis/apidocs/).
 
@@ -8,11 +11,10 @@ An JDK incubator HTTP client for use with the [Trellis Linked Data Platform](htt
 * [JDK 10](http://jdk.java.net/10/) or higher
 
 ### Building
-    $ gradle processBuildTools
     $ gradle build
 
 ### Test Requirements
-* Trellis Application version `0.6.0-SNAPSHOT` published in Maven Local
+* Trellis Application version [0.7.0-SNAPSHOT](https://github.com/christopher-johnson/trellis/tree/jpms)
 * a JUnit runner must be used with the VM option `--add-modules jdk.incubator.httpclient`
 
 ## API

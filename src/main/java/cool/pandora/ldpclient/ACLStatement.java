@@ -27,6 +27,8 @@ import org.trellisldp.vocabulary.ACL;
 import org.trellisldp.vocabulary.RDF;
 
 /**
+ * ACLStatement.
+ *
  * @author christopher-johnson
  */
 public class ACLStatement {
@@ -37,6 +39,8 @@ public class ACLStatement {
     private Graph graph = rdf.createGraph();
 
     /**
+     * ACLStatement.
+     *
      * @param modes a {@link Set} of ACL modes
      * @param agent a user agent
      * @param accessTo the resource this ACL grants access to
@@ -48,6 +52,8 @@ public class ACLStatement {
     }
 
     /**
+     * ByteArrayOutputStream.
+     *
      * @return ntriples as a {@link ByteArrayOutputStream}
      */
     public ByteArrayOutputStream getACL() {

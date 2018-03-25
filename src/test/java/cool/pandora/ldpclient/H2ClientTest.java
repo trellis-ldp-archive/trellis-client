@@ -18,36 +18,49 @@ import static io.dropwizard.testing.ConfigOverride.config;
 import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
 import static javax.ws.rs.core.HttpHeaders.LINK;
 import static org.apache.jena.riot.WebContent.contentTypeJSONLD;
+import static org.apache.jena.riot.WebContent.contentTypeNTriples;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.dropwizard.testing.DropwizardTestSupport;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+
 import javax.net.ssl.SSLContext;
+
+import jdk.incubator.http.HttpRequest;
+import jdk.incubator.http.HttpResponse;
+
 import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.jena.JenaRDF;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.trellisldp.app.TrellisApplication;
 import org.trellisldp.app.config.TrellisConfiguration;
 
+
 /**
+ * H2ClientTest.
+ *
  * @author christopher-johnson
  */
 public class H2ClientTest {
     private static final DropwizardTestSupport<TrellisConfiguration> APP = new DropwizardTestSupport<>(
-            TrellisApplication.class, resourceFilePath("trellis-config.yml"),
-            config("server.applicationConnectors[1].port", "8445"),
-            config("binaries", resourceFilePath("data") + "/binaries"),
-            config("mementos", resourceFilePath("data") + "/mementos"),
-            config("namespaces", resourceFilePath("data/namespaces.json")),
-            config("server.applicationConnectors[1].keyStorePath", resourceFilePath("keystore/trellis.jks")));
+            TrellisApplication.class, resourceFilePath("trellis-config.yml"), config("server"
+                    + ".applicationConnectors[1].port", "8445"), config("binaries", resourceFilePath("data")
+                    + "/binaries"), config("mementos", resourceFilePath("data") + "/mementos"), config("namespaces",
+                    resourceFilePath("data/namespaces.json")), config("server.applicationConnectors[1].keyStorePath",
+                    resourceFilePath("keystore/trellis.jks")));
     private static final JenaRDF rdf = new JenaRDF();
     private static String baseUrl;
     private static String pid;
@@ -55,7 +68,7 @@ public class H2ClientTest {
 
     @BeforeAll
     static void initAll() {
-       // APP.before();
+        APP.before();
         baseUrl = "https://localhost:8445/";
         try {
             final SimpleSSLContext sslct = new SimpleSSLContext();
@@ -69,7 +82,7 @@ public class H2ClientTest {
     @AfterAll
     static void tearDownAll() {
 
-        //APP.after();
+        APP.after();
     }
 
     @BeforeEach
@@ -82,16 +95,61 @@ public class H2ClientTest {
     }
 
     private static InputStream getTestJsonResource() {
-        return LdpClientTest.class.getResourceAsStream("/iiif3-canvas.json");
+        return LdpClientTest.class.getResourceAsStream("/webanno.complete-embedded.json");
     }
 
-    @Test
-    void testGetH2Resource() throws Exception {
+    private static InputStream getTestN3Resource() {
+        return LdpClientTest.class.getResourceAsStream("/webanno.complete.nt");
+    }
+
+    @RepeatedTest(80)
+    void testRepeatedPutH2N3Resource() throws Exception {
+        try {
+            final IRI identifier = rdf.createIRI(baseUrl + pid);
+            h2client.put(identifier, getTestN3Resource(), contentTypeNTriples);
+            final Map<String, List<String>> headers = h2client.head(identifier);
+            assertTrue(headers.containsKey(LINK));
+        } catch (Exception ex) {
+            throw new LdpClientException(ex.toString(), ex.getCause());
+        }
+    }
+
+    @RepeatedTest(400)
+    void testRepeatedPutH2JsonResource() throws Exception {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
             h2client.put(identifier, getTestJsonResource(), contentTypeJSONLD);
             final Map<String, List<String>> headers = h2client.head(identifier);
             assertTrue(headers.containsKey(LINK));
+        } catch (Exception ex) {
+            throw new LdpClientException(ex.toString(), ex.getCause());
+        }
+    }
+
+    @Test
+    void testNonBlockingAsyncGet() throws Exception {
+        try {
+            final IRI identifier = rdf.createIRI(baseUrl + pid);
+            final Map<HttpRequest, CompletableFuture<HttpResponse<String>>> results = h2client.multiSubscriberAsyncGet(
+                    identifier);
+        } catch (Exception ex) {
+            throw new LdpClientException(ex.toString(), ex.getCause());
+        }
+    }
+
+    @Test
+    void testJoiningCompleteableFuturePut() throws Exception {
+        try {
+            final Map<URI, InputStream> map = new HashMap<>();
+            final int LOOPS = 400;
+            for (int i = 0; i < LOOPS; i++) {
+                pid = "ldp-test-" + UUID.randomUUID().toString();
+                final IRI identifier = rdf.createIRI(baseUrl + pid);
+                final URI uri = new URI(identifier.getIRIString());
+                final InputStream is = getTestJsonResource();
+                map.put(uri, is);
+            }
+            h2client.joiningCompleteableFuturePut(map, contentTypeJSONLD);
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }

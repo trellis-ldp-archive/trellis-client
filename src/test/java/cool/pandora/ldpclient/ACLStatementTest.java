@@ -24,6 +24,8 @@ import org.junit.jupiter.api.Test;
 import org.trellisldp.vocabulary.ACL;
 
 /**
+ * ACLStatementTest.
+ *
  * @author christopher-johnson
  */
 class ACLStatementTest {

@@ -15,9 +15,15 @@
 package cool.pandora.ldpclient;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+
+import jdk.incubator.http.HttpRequest;
+import jdk.incubator.http.HttpResponse;
+
 import org.apache.commons.rdf.api.IRI;
 
 /**
@@ -28,6 +34,8 @@ import org.apache.commons.rdf.api.IRI;
 public interface LdpClient {
 
     /**
+     * head.
+     *
      * @param identifier a resource identifier
      * @return Map of headers
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
@@ -35,6 +43,8 @@ public interface LdpClient {
     Map<String, List<String>> head(final IRI identifier) throws LdpClientException;
 
     /**
+     * getJson.
+     *
      * @param identifier a resource identifier
      * @return body as a {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
@@ -42,6 +52,8 @@ public interface LdpClient {
     String getJson(final IRI identifier) throws LdpClientException;
 
     /**
+     * getDefaultType.
+     *
      * @param identifier a resource identifier
      * @return body as a {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
@@ -49,6 +61,8 @@ public interface LdpClient {
     String getDefaultType(final IRI identifier) throws LdpClientException;
 
     /**
+     * getWithContentType.
+     *
      * @param identifier a resource identifier
      * @param contentType a content type (text/turtle, application/n-triples or application/ld+json)
      * @return body as a {@link String}
@@ -57,6 +71,8 @@ public interface LdpClient {
     String getWithContentType(final IRI identifier, final String contentType) throws LdpClientException;
 
     /**
+     * getAcceptDatetime.
+     *
      * @param identifier a resource identifier
      * @param timestamp an epoch millisecond
      * @return headers as a {@link Map}
@@ -65,6 +81,8 @@ public interface LdpClient {
     Map<String, List<String>> getAcceptDatetime(final IRI identifier, String timestamp) throws LdpClientException;
 
     /**
+     * getTimeMapLinkDefaultFormat.
+     *
      * @param identifier a resource identifier
      * @return body as a {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
@@ -72,6 +90,8 @@ public interface LdpClient {
     String getTimeMapLinkDefaultFormat(IRI identifier) throws LdpClientException;
 
     /**
+     * getTimeMapJsonProfile.
+     *
      * @param identifier a resource identifier
      * @param profile a JSON-LD profile
      * @return body as a {@link String}
@@ -81,6 +101,8 @@ public interface LdpClient {
     String getTimeMapJsonProfile(IRI identifier, String profile) throws LdpClientException;
 
     /**
+     * getVersionJson.
+     *
      * @param identifier a resource identifier
      * @param profile a JSON-LD profile
      * @param timestamp an epoch millisecond
@@ -91,6 +113,8 @@ public interface LdpClient {
     String getVersionJson(IRI identifier, String profile, String timestamp) throws LdpClientException;
 
     /**
+     * getBinary.
+     *
      * @param identifier a resource identifier
      * @param file an output file as an {@link Path}
      * @return body as a {@link Path}
@@ -99,6 +123,8 @@ public interface LdpClient {
     Path getBinary(IRI identifier, Path file) throws LdpClientException;
 
     /**
+     * getBinary.
+     *
      * @param identifier a resource identifier
      * @return body as a byte[]
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
@@ -106,6 +132,8 @@ public interface LdpClient {
     byte[] getBinary(IRI identifier) throws LdpClientException;
 
     /**
+     * getBinaryDigest.
+     *
      * @param identifier a resource identifier
      * @param algorithm a digest algorithm (md5, sha, sha-256 or sha-512)
      * @return digest as a {@link String}
@@ -114,6 +142,8 @@ public interface LdpClient {
     String getBinaryDigest(IRI identifier, String algorithm) throws LdpClientException;
 
     /**
+     * getBinaryVersion.
+     *
      * @param identifier a resource identifier
      * @param file an output file as an {@link Path}
      * @param timestamp an epoch millisecond
@@ -123,6 +153,8 @@ public interface LdpClient {
     Path getBinaryVersion(IRI identifier, Path file, String timestamp) throws LdpClientException;
 
     /**
+     * getBinaryVersion.
+     *
      * @param identifier a resource identifier
      * @param timestamp an epoch millisecond
      * @return body as a byte[]
@@ -131,6 +163,8 @@ public interface LdpClient {
     byte[] getBinaryVersion(IRI identifier, String timestamp) throws LdpClientException;
 
     /**
+     * getRange.
+     *
      * @param identifier a resource identifier
      * @param byterange a byterange
      * @return body as a byte[]
@@ -139,6 +173,8 @@ public interface LdpClient {
     byte[] getRange(final IRI identifier, String byterange) throws LdpClientException;
 
     /**
+     * getPrefer.
+     *
      * @param identifier a resource identifier
      * @param prefer an LDP preference
      * @return body as a {@link String}
@@ -149,6 +185,8 @@ public interface LdpClient {
     String getPrefer(final IRI identifier, String prefer) throws LdpClientException;
 
     /**
+     * getPreferMinimal.
+     *
      * @param identifier a resource identifier
      * @return body as a {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
@@ -156,6 +194,8 @@ public interface LdpClient {
     String getPreferMinimal(IRI identifier) throws LdpClientException;
 
     /**
+     * getJsonProfile.
+     *
      * @param identifier a resource identifier
      * @param profile a JSON-LD profile
      * @return body as a {@link String}
@@ -165,6 +205,8 @@ public interface LdpClient {
     String getJsonProfile(IRI identifier, String profile) throws LdpClientException;
 
     /**
+     * getJsonProfileLDF.
+     *
      * @param identifier a resource identifier
      * @param profile a JSON-LD profile
      * @param subject RdfTerm as a {@link String}
@@ -178,6 +220,8 @@ public interface LdpClient {
             LdpClientException;
 
     /**
+     * getJsonLDF.
+     *
      * @param identifier a resource identifier
      * @param subject RdfTerm as a {@link String}
      * @param predicate RdfTerm as a {@link String}
@@ -188,6 +232,8 @@ public interface LdpClient {
     String getJsonLDF(IRI identifier, String subject, String predicate, String object) throws LdpClientException;
 
     /**
+     * getAcl.
+     *
      * @param identifier a resource identifier
      * @param contentType a content type as {@link String}
      * @return body as a {@link String}
@@ -197,6 +243,8 @@ public interface LdpClient {
 
 
     /**
+     * getCORS.
+     *
      * @param identifier a resource identifier
      * @param origin a root resource identifier
      * @return headers as a {@link Map}
@@ -205,6 +253,8 @@ public interface LdpClient {
     Map<String, List<String>> getCORS(final IRI identifier, final IRI origin) throws LdpClientException;
 
     /**
+     * getCORSSimple.
+     *
      * @param identifier a resource identifier
      * @param origin a root resource identifier
      * @return headers as a {@link Map}
@@ -213,6 +263,8 @@ public interface LdpClient {
     Map<String, List<String>> getCORSSimple(final IRI identifier, final IRI origin) throws LdpClientException;
 
     /**
+     * getWithMetadata.
+     *
      * @param identifier a resource identifier
      * @param metadata a {@link Map} of headers
      * @return body as a {@link String}
@@ -221,6 +273,8 @@ public interface LdpClient {
     String getWithMetadata(IRI identifier, Map<String, String> metadata) throws LdpClientException;
 
     /**
+     * getBytesWithMetadata.
+     *
      * @param identifier a resource identifier
      * @param metadata a {@link Map} of headers
      * @return body as a byte[]
@@ -229,6 +283,8 @@ public interface LdpClient {
     byte[] getBytesWithMetadata(IRI identifier, Map<String, String> metadata) throws LdpClientException;
 
     /**
+     * getResponse.
+     *
      * @param identifier a resource identifier
      * @param metadata a {@link Map} of headers
      * @return body and headers as a {@link Map}
@@ -238,6 +294,8 @@ public interface LdpClient {
             throws LdpClientException;
 
     /**
+     * options.
+     *
      * @param identifier a resource identifier
      * @return headers as a {@link Map}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
@@ -245,6 +303,8 @@ public interface LdpClient {
     Map<String, List<String>> options(final IRI identifier) throws LdpClientException;
 
     /**
+     * post.
+     *
      * @param identifier a resource identifier
      * @param stream an {@link InputStream}
      * @param contentType a content type
@@ -253,6 +313,8 @@ public interface LdpClient {
     void post(final IRI identifier, final InputStream stream, final String contentType) throws LdpClientException;
 
     /**
+     * postWithMetadata.
+     *
      * @param identifier a resource identifier
      * @param stream an {@link InputStream}
      * @param metadata a {@link Map} of headers
@@ -262,6 +324,8 @@ public interface LdpClient {
             LdpClientException;
 
     /**
+     * postWithAuth.
+     *
      * @param identifier a resource identifier
      * @param stream an {@link InputStream}
      * @param contentType a content type
@@ -272,6 +336,8 @@ public interface LdpClient {
             authorization) throws LdpClientException;
 
     /**
+     * postSlug.
+     *
      * @param identifier a resource identifier
      * @param slug a resource name as a {@link String}
      * @param stream an {@link InputStream}
@@ -282,6 +348,8 @@ public interface LdpClient {
             LdpClientException;
 
     /**
+     * postBinaryWithDigest.
+     *
      * @param identifier a resource identifier
      * @param stream an {@link InputStream}
      * @param contentType a content type
@@ -293,6 +361,8 @@ public interface LdpClient {
             digest) throws LdpClientException;
 
     /**
+     * newLdpDc.
+     *
      * @param identifier a resource identifier
      * @param slug a resource name as a {@link String}
      * @param membershipObj a membership Object identifier
@@ -301,6 +371,8 @@ public interface LdpClient {
     void newLdpDc(final IRI identifier, final String slug, IRI membershipObj) throws LdpClientException;
 
     /**
+     * newLdpDcWithAuth.
+     *
      * @param identifier a resource identifier
      * @param slug a resource name as a {@link String}
      * @param membershipObj a membership Object identifier
@@ -311,6 +383,8 @@ public interface LdpClient {
             LdpClientException;
 
     /**
+     * put.
+     *
      * @param identifier a resource identifier
      * @param stream an {@link InputStream}
      * @param contentType a content type
@@ -319,6 +393,8 @@ public interface LdpClient {
     void put(final IRI identifier, final InputStream stream, final String contentType) throws LdpClientException;
 
     /**
+     * putWithResponse.
+     *
      * @param identifier a resource identifier
      * @param stream an {@link InputStream}
      * @param contentType a content type
@@ -329,6 +405,8 @@ public interface LdpClient {
             LdpClientException;
 
     /**
+     * putWithMetadata.
+     *
      * @param identifier a resource identifier
      * @param stream an {@link InputStream}
      * @param metadata a {@link Map} of headers
@@ -338,6 +416,8 @@ public interface LdpClient {
             LdpClientException;
 
     /**
+     * putWithAuth.
+     *
      * @param identifier a resource identifier
      * @param stream an {@link InputStream}
      * @param contentType a content Type as a {@link String}
@@ -348,6 +428,8 @@ public interface LdpClient {
             authorization) throws LdpClientException;
 
     /**
+     * putIfMatch.
+     *
      * @param identifier a resource identifier
      * @param stream an {@link InputStream}
      * @param contentType a content type
@@ -358,6 +440,8 @@ public interface LdpClient {
             LdpClientException;
 
     /**
+     * putBinaryWithDigest.
+     *
      * @param identifier a resource identifier
      * @param stream an {@link InputStream}
      * @param contentType a content type
@@ -369,6 +453,8 @@ public interface LdpClient {
             throws LdpClientException;
 
     /**
+     * putIfUnmodified.
+     *
      * @param identifier a resource identifier
      * @param stream an {@link InputStream}
      * @param contentType a content type
@@ -379,12 +465,16 @@ public interface LdpClient {
             throws LdpClientException;
 
     /**
+     * delete.
+     *
      * @param identifier a resource identifier
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
     void delete(final IRI identifier) throws LdpClientException;
 
     /**
+     * patch.
+     *
      * @param identifier a resource identifier
      * @param stream an {@link InputStream}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
@@ -392,47 +482,31 @@ public interface LdpClient {
     void patch(final IRI identifier, final InputStream stream) throws LdpClientException;
 
     /**
-     * @param identifier a resource identifier
-     */
-    void multipartOptions(final IRI identifier);
-
-    /**
-     * @param identifier a resource identifier
-     * @param stream an {@link InputStream}
-     */
-    void multipartStart(final IRI identifier, final InputStream stream);
-
-    /**
-     * @param identifier a resource identifier
-     * @param sessionId a session identifier
-     */
-    void multipartGet(final IRI identifier, String sessionId);
-
-    /**
-     * @param identifier a resource identifier
-     * @param stream an {@link InputStream}
-     * @param sessionId a session identifier
-     */
-    void multipartPut(final IRI identifier, final InputStream stream, String sessionId);
-
-    /**
-     * @param identifier a resource identifier
-     * @param stream an {@link InputStream}
-     * @param sessionId a session identifier
-     */
-    void multipartPost(final IRI identifier, final InputStream stream, String sessionId);
-
-    /**
-     * @param identifier a resource identifier
-     * @param sessionId a session identifier
-     */
-    void multipartDelete(final IRI identifier, String sessionId);
-
-    /**
+     * asyncPut.
+     *
      * @param identifier a resource identifier
      * @param stream an {@link InputStream}
      * @throws LdpClientException an URISyntaxException
      */
     void asyncPut(final IRI identifier, final InputStream stream) throws LdpClientException;
+
+    /**
+     * multiSubscriberAsyncGet.
+     *
+     * @param identifier a resource identifier
+     * @return an {@link Map}
+     * @throws LdpClientException an URISyntaxException
+     */
+    Map<HttpRequest, CompletableFuture<HttpResponse<String>>> multiSubscriberAsyncGet(
+            final IRI identifier) throws LdpClientException;
+
+    /**
+     * joiningCompleteableFuturePut.
+     *
+     * @param bodies a Map of URI keys with InputStream values
+     * @param contentType a content Type
+     */
+    void joiningCompleteableFuturePut(Map<URI, InputStream> bodies, final String
+            contentType);
 
 }

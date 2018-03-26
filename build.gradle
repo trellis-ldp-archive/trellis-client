@@ -172,7 +172,6 @@ javaModule {
 }
 dependencies {
 
-    patch 'commons-codec:commons-codec:1.11'
     patch 'commons-logging:commons-logging:1.2'
     patch 'com.google.code.findbugs:jsr305:3.0.2'
     patch 'log4j:log4j:1.2.17'

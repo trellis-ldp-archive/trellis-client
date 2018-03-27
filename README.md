@@ -14,7 +14,7 @@ An JDK incubator HTTP client for use with the [Trellis Linked Data Platform](htt
     $ gradle build
 
 ### Test Requirements
-* Trellis Application version [0.7.0-SNAPSHOT](https://github.com/christopher-johnson/trellis/tree/jpms)
+* Trellis Application version [0.7.0-SNAPSHOT](https://github.com/trellis-ldp/trellis/tree/jpms) published in Maven Local
 * a JUnit runner must be used with the VM option `--add-modules jdk.incubator.httpclient`
 
 ## API

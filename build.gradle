@@ -172,7 +172,6 @@ javaModule {
 }
 dependencies {
 
-    patch 'commons-codec:commons-codec:1.11'
     patch 'commons-logging:commons-logging:1.2'
     patch 'com.google.code.findbugs:jsr305:3.0.2'
     patch 'log4j:log4j:1.2.17'
@@ -191,6 +190,7 @@ dependencies {
     compile group: 'org.apache.commons', name: 'commons-rdf-jena', version: commonsRdfVersion
     compile group: 'org.trellisldp', name: 'trellis-vocabulary', version: trellisVersion
     compile "javax.ws.rs:javax.ws.rs-api:${jaxrsVersion}"
+    compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
     compile group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
     testCompile group: 'xerces', name: 'xercesImpl', version: xerxesVersion
     testCompile("org.junit.jupiter:junit-jupiter-api:${junitVersion}")

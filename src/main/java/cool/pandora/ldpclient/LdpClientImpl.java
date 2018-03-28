@@ -872,7 +872,7 @@ public class LdpClientImpl implements LdpClient {
     }
 
     @Override
-    public void joiningCompleteableFuturePut(final Map<URI, InputStream> bodies, final String contentType) {
+    public void joiningCompletableFuturePut(final Map<URI, InputStream> bodies, final String contentType) {
         CompletableFuture.allOf(bodies.entrySet().stream().map(k -> client.sendAsync(HttpRequest.newBuilder(k.getKey())
                 .headers(CONTENT_TYPE, contentType).PUT(fromInputStream(k::getValue)).build(), asString())
                 .thenApply(HttpResponse::statusCode)).toArray(CompletableFuture<?>[]::new)).join();

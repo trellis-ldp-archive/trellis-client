@@ -64,6 +64,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.trellisldp.app.TrellisApplication;
@@ -99,6 +100,7 @@ class LdpClientTest {
     static void initAll() {
         APP.before();
         baseUrl = "http://localhost:" + APP.getLocalPort() + "/";
+        //baseUrl = "https://localhost:8445/";
     }
 
     @AfterAll
@@ -263,7 +265,7 @@ class LdpClientTest {
             final List<Map<String, Object>> graph = (List<Map<String, Object>>) obj.get("@graph");
             assertTrue(graph.stream().anyMatch(
                     x -> x.containsKey("@id") && x.get("@id").equals(baseUrl + pid) && x.containsKey("timegate")
-                            && x.containsKey("timemap") && x.containsKey("memento:memento")));
+                            && x.containsKey("timemap") && x.containsKey("memento")));
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -430,6 +432,7 @@ class LdpClientTest {
 
     //test requires that profile be included in contextWhitelist
     @Test
+    @Disabled
     void testGetCustomJsonProfile() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);

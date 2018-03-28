@@ -506,7 +506,7 @@ public interface LdpClient {
      * @param bodies a Map of URI keys with InputStream values
      * @param contentType a content Type
      */
-    void joiningCompleteableFuturePut(Map<URI, InputStream> bodies, final String
+    void joiningCompletableFuturePut(Map<URI, InputStream> bodies, final String
             contentType);
 
 }

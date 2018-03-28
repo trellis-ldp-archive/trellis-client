@@ -102,13 +102,13 @@ public class H2ClientTest {
         return LdpClientTest.class.getResourceAsStream("/webanno.complete.nt");
     }
 
-    @RepeatedTest(80)
+    @RepeatedTest(400)
     void testRepeatedPutH2N3Resource() throws Exception {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
             h2client.put(identifier, getTestN3Resource(), contentTypeNTriples);
-            final Map<String, List<String>> headers = h2client.head(identifier);
-            assertTrue(headers.containsKey(LINK));
+            //final Map<String, List<String>> headers = h2client.head(identifier);
+            //assertTrue(headers.containsKey(LINK));
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -138,7 +138,7 @@ public class H2ClientTest {
     }
 
     @Test
-    void testJoiningCompleteableFuturePut() throws Exception {
+    void testJoiningCompletableFuturePut() throws Exception {
         try {
             final Map<URI, InputStream> map = new HashMap<>();
             final int LOOPS = 400;
@@ -146,10 +146,10 @@ public class H2ClientTest {
                 pid = "ldp-test-" + UUID.randomUUID().toString();
                 final IRI identifier = rdf.createIRI(baseUrl + pid);
                 final URI uri = new URI(identifier.getIRIString());
-                final InputStream is = getTestJsonResource();
+                final InputStream is = getTestN3Resource();
                 map.put(uri, is);
             }
-            h2client.joiningCompleteableFuturePut(map, contentTypeJSONLD);
+            h2client.joiningCompletableFuturePut(map, contentTypeNTriples);
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }

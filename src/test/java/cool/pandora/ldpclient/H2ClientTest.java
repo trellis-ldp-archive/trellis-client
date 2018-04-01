@@ -149,10 +149,27 @@ public class H2ClientTest {
                 final InputStream is = getTestJsonResource();
                 map.put(uri, is);
             }
-            h2client.joiningCompleteableFuturePut(map, contentTypeJSONLD);
+            h2client.joiningCompletableFuturePut(map, contentTypeJSONLD);
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
     }
 
+    @Test
+    void testAsyncPutWithStatus() throws Exception {
+        try {
+            final Map<URI, InputStream> map = new HashMap<>();
+            final int LOOPS = 400;
+            for (int i = 0; i < LOOPS; i++) {
+                pid = "ldp-test-" + UUID.randomUUID().toString();
+                final IRI identifier = rdf.createIRI(baseUrl + pid);
+                final URI uri = new URI(identifier.getIRIString());
+                final InputStream is = getTestN3Resource();
+                map.put(uri, is);
+            }
+            h2client.asyncPutWithStatus(map, contentTypeNTriples);
+        } catch (Exception ex) {
+            throw new LdpClientException(ex.toString(), ex.getCause());
+        }
+    }
 }

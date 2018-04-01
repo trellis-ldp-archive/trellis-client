@@ -506,7 +506,47 @@ public interface LdpClient {
      * @param bodies a Map of URI keys with InputStream values
      * @param contentType a content Type
      */
-    void joiningCompleteableFuturePut(Map<URI, InputStream> bodies, final String
+    void joiningCompletableFuturePut(Map<URI, InputStream> bodies, final String
             contentType);
 
+    void asyncPutWithStatus(final Map<URI, InputStream> bodies, final String contentType);
+
+    /**
+     * getQuery.
+     *
+     * @param query       a complete formatted URI string
+     * @param contentType content Type as a {@link String}
+     * @return body as {@link String}
+     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+     */
+    String getQuery(final String query, final String contentType) throws LdpClientException;
+
+    /**
+     * asyncGetQuery.
+     *
+     * @param query       a complete formatted URI string
+     * @param contentType content Type as a {@link String}
+     * @return body as {@link String}
+     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+     */
+    String asyncGetQuery(final String query, final String contentType) throws LdpClientException;
+
+    /**
+     * syncUpdate.
+     *
+     * @param identifier a sparql interface
+     * @param query      a sparql query body
+     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+     */
+    void syncUpdate(final IRI identifier, final String query) throws LdpClientException;
+
+    /**
+     * asyncUpdate.
+     *
+     * @param queries Map
+     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+     */
+    void asyncUpdate(Map<URI, String> queries) throws LdpClientException;
+
+    void sendAsync(HttpRequest request, HttpResponse.BodyHandler<byte[]> response);
 }

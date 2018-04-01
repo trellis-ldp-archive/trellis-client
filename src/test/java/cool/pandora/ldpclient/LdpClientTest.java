@@ -777,5 +777,4 @@ class LdpClientTest {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
     }
-
 }

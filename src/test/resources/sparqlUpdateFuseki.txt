@@ -1,0 +1,14 @@
+PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ex:   <http://example.org/>
+PREFIX zoo:   <http://example.org/zoo/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+INSERT DATA {
+ex:dog1    rdf:type         ex:animal .
+ex:cat1    rdf:type         ex:cat .
+ex:cat     rdfs:subClassOf  ex:animal .
+zoo:host   rdfs:range       ex:animal .
+ex:zoo1    zoo:host         ex:cat2 .
+ex:cat3    owl:sameAs       ex:cat2 .
+}

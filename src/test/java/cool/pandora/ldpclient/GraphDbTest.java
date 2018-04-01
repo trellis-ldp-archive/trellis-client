@@ -14,9 +14,14 @@
 package cool.pandora.ldpclient;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static javax.ws.rs.core.HttpHeaders.ACCEPT;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static jdk.incubator.http.HttpRequest.BodyPublisher.fromByteArray;
+import static jdk.incubator.http.HttpRequest.BodyPublisher.fromString;
 import static jdk.incubator.http.HttpResponse.BodyHandler.asByteArray;
+import static jdk.incubator.http.HttpResponse.BodyHandler.asString;
+import static jdk.incubator.http.HttpResponse.BodyHandler.discard;
+import static org.apache.jena.riot.WebContent.contentTypeSPARQLQuery;
 import static org.apache.jena.riot.WebContent.contentTypeSPARQLUpdate;
 
 import java.io.BufferedReader;
@@ -24,15 +29,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.net.ssl.SSLContext;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.jena.JenaRDF;
 import org.junit.jupiter.api.BeforeAll;
@@ -41,6 +51,7 @@ import org.junit.jupiter.api.Test;
 
 import jdk.incubator.http.HttpClient;
 import jdk.incubator.http.HttpRequest;
+import jdk.incubator.http.HttpResponse;
 
 public class GraphDbTest {
     private static HttpClient client = getClient();
@@ -82,6 +93,42 @@ public class GraphDbTest {
         final InputStream is = getSparqlUpdate();
         String update = readFile(is);
         h2client.syncUpdate(identifier, update);
+    }
+
+    private void joiningCompletableFuturePostUpdate(URI target, final List<String> updates) throws Exception {
+        final int REQUESTS = 200;
+        CompletableFuture[] results = new CompletableFuture<?>[REQUESTS];
+        URI uri = new URI(baseUrl + "?query=SELECT%20%3Fsubject%20%3Fpredicate%20%3Fobject%0AWHERE%20%7B%0A%20%20%3Fsubject%20" +
+                "%3Fpredicate%20%3Fobject%0A%7D");
+        for (int i = 0; i < REQUESTS; i++) {
+            results[i] = client.sendAsync(
+                    HttpRequest.newBuilder(uri).headers(CONTENT_TYPE,
+                            contentTypeSPARQLQuery, ACCEPT, "application/sparql-results+json").GET().build(), asString());
+        }
+        CompletableFuture<?>[] cf = updates.stream().map((u) ->
+            client.sendAsync(HttpRequest.newBuilder(target).headers(CONTENT_TYPE, contentTypeSPARQLUpdate).POST(
+                    fromString(u)).build(), discard(null)).thenApply(HttpResponse::statusCode)).toArray(
+                    CompletableFuture<?>[]::new);
+        CompletableFuture[] cf2 = ArrayUtils.addAll(results, cf);
+        CompletableFuture.allOf(cf2).join();
+    }
+
+    @Test
+    void testJoiningCompleteableFuturePostUpdate() throws Exception {
+        try {
+            URI uri = new URI(baseUrl + "/update");
+            final List<String> list = new ArrayList<>();
+            final int LOOPS = 400;
+            for (int i = 0; i < LOOPS; i++) {
+                String pid = "urn:" + UUID.randomUUID().toString();
+
+                final String update = "INSERT DATA { <" + pid + "> <urn:x:p> <urn:x:o>}";
+                list.add(update);
+            }
+            joiningCompletableFuturePostUpdate(uri, list);
+        } catch (Exception ex) {
+            throw new LdpClientException(ex.toString(), ex.getCause());
+        }
     }
 
     @Test

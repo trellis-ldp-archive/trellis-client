@@ -1,0 +1,80 @@
+{
+  "@graph": [
+    {
+      "@id": "http://localhost:42891/ldp-test-a4ba1887-6f2a-4f48-a8dc-352d5879a405",
+      "@type": [
+        "memento:TimeGate",
+        "memento:OriginalResource"
+      ],
+      "memento:memento": {
+        "@id": "http://localhost:42891/ldp-test-a4ba1887-6f2a-4f48-a8dc-352d5879a405?version=1523875058000"
+      },
+      "timegate": "http://localhost:42891/ldp-test-a4ba1887-6f2a-4f48-a8dc-352d5879a405",
+      "timemap": "http://localhost:42891/ldp-test-a4ba1887-6f2a-4f48-a8dc-352d5879a405?ext=timemap"
+    },
+    {
+      "@id": "http://localhost:42891/ldp-test-a4ba1887-6f2a-4f48-a8dc-352d5879a405?ext=timemap",
+      "@type": "memento:TimeMap",
+      "hasBeginning": "http://reference.data.gov.uk/id/gregorian-instant/2018-04-16T10:37:38Z",
+      "hasEnd": "http://reference.data.gov.uk/id/gregorian-instant/2018-04-16T10:37:43Z"
+    },
+    {
+      "@id": "http://localhost:42891/ldp-test-a4ba1887-6f2a-4f48-a8dc-352d5879a405?version=1523875058000",
+      "@type": "memento:Memento",
+      "mementoDatetime": "2018-04-16T10:37:38Z",
+      "original": "http://localhost:42891/ldp-test-a4ba1887-6f2a-4f48-a8dc-352d5879a405",
+      "timegate": "http://localhost:42891/ldp-test-a4ba1887-6f2a-4f48-a8dc-352d5879a405",
+      "timemap": "http://localhost:42891/ldp-test-a4ba1887-6f2a-4f48-a8dc-352d5879a405?ext=timemap",
+      "hasTime": "http://reference.data.gov.uk/id/gregorian-instant/2018-04-16T10:37:38Z"
+    }
+  ],
+  "@context": {
+    "hasEnd": {
+      "@id": "http://www.w3.org/2006/time#hasEnd",
+      "@type": "@id"
+    },
+    "hasBeginning": {
+      "@id": "http://www.w3.org/2006/time#hasBeginning",
+      "@type": "@id"
+    },
+    "memento": "http://mementoweb.org/ns#",
+    "timemap": {
+      "@id": "http://mementoweb.org/ns#timemap",
+      "@type": "@id"
+    },
+    "timegate": {
+      "@id": "http://mementoweb.org/ns#timegate",
+      "@type": "@id"
+    },
+    "mementoDatetime": {
+      "@id": "http://mementoweb.org/ns#mementoDatetime",
+      "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+    },
+    "hasTime": {
+      "@id": "http://www.w3.org/2006/time#hasTime",
+      "@type": "@id"
+    },
+    "original": {
+      "@id": "http://mementoweb.org/ns#original",
+      "@type": "@id"
+    },
+    "dctypes": "http://purl.org/dc/dcmitype/",
+    "schema": "http://schema.org/",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "acl": "http://www.w3.org/ns/auth/acl#",
+    "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
+    "dc11": "http://purl.org/dc/elements/1.1/",
+    "as": "http://www.w3.org/ns/activitystreams#",
+    "oa": "http://www.w3.org/ns/oa#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "ldp": "http://www.w3.org/ns/ldp#",
+    "iana": "http://www.iana.org/assignments/relation/",
+    "time": "http://www.w3.org/2006/time#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "foaf": "http://xmlns.com/foaf/0.1/",
+    "dc": "http://purl.org/dc/terms/"
+  }
+}

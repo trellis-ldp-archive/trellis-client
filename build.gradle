@@ -5,6 +5,7 @@ buildscript {
 
     dependencies {
         classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.1'
     }
 }
 
@@ -14,226 +15,217 @@ plugins {
     id 'io.codearte.nexus-staging' version '0.9.0'
 }
 
-apply plugin: 'java'
-apply plugin: 'java-library'
-apply plugin: 'maven-publish'
-apply plugin: 'checkstyle'
-apply plugin: 'com.bmuschko.nexus'
-apply plugin: 'osgi'
-
-group = 'cool.pandora'
-
-sourceCompatibility = 1.10
-targetCompatibility = 1.10
-
-repositories {
-    mavenLocal()
-    mavenCentral()
-    flatDir {
-        dirs "$rootProject.projectDir/lib"
-    }
-}
-
 ext {
-    name = 'LDP Client'
-    moduleName = 'cool.pandora.ldpclient'
-    description = 'A Linked Data Platform Client'
-    url = 'https://github.com/pan-dora/ldp-client/'
-    inceptionYear = '2017'
-    vendor = 'Pandora Ecosystem'
-    homepage = 'http://cool.pandora'
-    docURL = 'https://github.com/pan-dora/ldp-client/wiki'
-    license = 'Apache 2'
-
+    /* Testing */
+    activationApiVersion = '1.2.0'
+    commonsCollectionsVersion = '4.1'
     commonsRdfVersion = '0.5.0'
     dropwizardVersion = '1.2.0'
     hamcrestLibraryVersion = '1.3'
-    httpClientOsgiVersion = '4.5.3'
+    httpclientVersion = '4.5.3'
+    jenaArqVersion = '3.8.0-SNAPSHOT'
+    jenaRdfConnectionVersion = '3.8.0-SNAPSHOT'
+    jenaVersion = '3.7.0'
     jettyAlpnVersion = '9.4.8.v20171121'
+    jsonldVersion = '0.12.0'
     jsonWebTokenVersion = '0.9.0'
     junitVersion = '5.1.0'
     logbackVersion = '1.2.3'
     jaxrsVersion = '2.1'
+    kafkaVersion = '1.0.0_1'
+    mustacheVersion = '0.9.5_1'
     slf4jVersion = "1.7.25"
-    trellisVersion = '0.5.2'
+    trellisVersion = '0.6.2'
     trellisAppVersion = '0.7.0-SNAPSHOT'
     projectOsgiVersion = project.version.replaceAll("-SNAPSHOT", ".SNAPSHOT")
-    xerxesVersion = '2.11.0'
+    servicemixXercesVersion = '2.11.0_1'
+    thriftVersion = '0.11.0'
 
-    jacocoVersion = '0.8.0'
+    jacocoVersion = '0.8.1'
     checkstyleVersion = '8.8'
+
+    jacocoTestProjects = [
+            'client'
+    ]
 }
 
-gradle.projectsEvaluated {
-    tasks.withType(JavaCompile) {
-        options.compilerArgs.add("-Xlint:unchecked")
-        options.compilerArgs.add("-Xlint:deprecation")
-        options.compilerArgs.addAll(["--add-modules", "jdk.incubator.httpclient"])
+allprojects { subproj ->
+
+    apply plugin: 'java'
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
+    apply plugin: 'checkstyle'
+    apply plugin: 'com.bmuschko.nexus'
+    apply plugin: 'org.junit.platform.gradle.plugin'
+    apply plugin: 'jacoco'
+
+    ext {
+        name = 'TrellisLDP Client'
+        moduleName = 'org.trellisldp.client'
+        description = 'A Linked Data Platform Client'
+        url = 'https://github.com/trellisldp/trellis-client'
+        inceptionYear = '2017'
+        vendor = 'Trellis LDP'
+        homepage = 'https://www.trellisldp.org'
+        docURL = 'https://trellis-ldp.github.io/trellis-client/apidocs/'
+        license = 'Apache 2'
     }
-}
 
-checkstyle {
-    configFile = rootProject.file('buildtools/src/main/resources/checkstyle/checkstyle.xml')
-    configProperties.checkstyleConfigDir = rootProject.file('buildtools/src/main/resources/checkstyle/')
-    toolVersion = checkstyleVersion
-}
+    jacoco.toolVersion = jacocoVersion
 
-license {
-    include "**/*.java"
-    header rootProject.file('buildtools/src/main/resources/license/HEADER.txt')
-    strictCheck true
-    mapping {
-        java = 'SLASHSTAR_STYLE'
-    }
-}
+    group = 'org.trellisldp'
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            from components.java
+    repositories {
+        mavenCentral()
+        flatDir {
+            dirs "$rootProject.projectDir/lib"
         }
     }
+
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs.add("-Xlint:unchecked")
+            options.compilerArgs.add("-Xlint:deprecation")
+            options.compilerArgs.addAll(["--add-modules", "jdk.incubator.httpclient"])
+        }
+    }
+
+    junitPlatformTest.jvmArgs("--add-modules", "jdk.incubator.httpclient")
+
+    dependencies {
+        testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+        testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+    }
+
 }
 
-modifyPom {
-    //noinspection GroovyAssignabilityCheck
-    project {
-        name name
-        description description
-        url url
-        inceptionYear inceptionYear
+subprojects { subproj ->
 
-        organization {
-            name vendor
-            url homepage
+    sourceCompatibility = 1.10
+    targetCompatibility = 1.10
+
+    checkstyle {
+        configFile = rootProject.file('buildtools/src/main/resources/checkstyle/checkstyle.xml')
+        configProperties.checkstyleConfigDir = rootProject.file('buildtools/src/main/resources/checkstyle/')
+        toolVersion = checkstyleVersion
+    }
+
+    license {
+        include "**/*.java"
+        header rootProject.file('buildtools/src/main/resources/license/HEADER.txt')
+        strictCheck true
+        mapping {
+            java = 'SLASHSTAR_STYLE'
         }
+    }
 
-        developers {
-            developer {
-                id 'christopher-johnson'
-                name 'Christopher Johnson'
-                email 'chjohnson @ (domain of organization url)'
-                organization 'Pan-dora Ecosystem'
-                organizationUrl 'https://pan-dora.github.io/'
-                roles {
-                    role 'developer'
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                from components.java
+            }
+        }
+    }
+
+    modifyPom {
+        //noinspection GroovyAssignabilityCheck
+        project {
+            name name
+            description description
+            url url
+            inceptionYear inceptionYear
+
+            organization {
+                name vendor
+                url homepage
+            }
+
+            developers {
+                developer {
+                    id 'christopher-johnson'
+                    name 'Christopher Johnson'
+                    email 'chjohnson @ (domain of organization url)'
+                    organization = 'Trellis LDP'
+                    organizationUrl 'https://www.trellisldp.org'
+                    roles {
+                        role 'developer'
+                    }
+                    timezone '+1'
                 }
-                timezone '+1'
+            }
+
+            scm {
+                connection 'scm:git:git://github.com/trellis-ldp/trellis-client.git'
+                developerConnection 'scm:git:git://github.com/trellis-ldp/trellis-client.git'
+                url 'https://github.com/trellisldp/trellis-client/'
+                tag 'HEAD'
+            }
+
+            licenses {
+                license {
+                    name 'Apache License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0'
+                }
             }
         }
+    }
 
-        scm {
-            connection 'scm:git:git://github.com/pan-dora/ldp-client.git'
-            developerConnection 'scm:git:git@github.com/pan-dora/ldp-client.git'
-            url 'https://github.com/pan-dora/ldp-client/'
-            tag 'HEAD'
+    nexusStaging {
+        packageGroup = "org.trellisldp"
+        //stagingProfileId = "4d5f13c386f543"
+    }
+
+    nexus {
+        sign = true
+        repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+        snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+
+    javadoc {
+        inputs.property("moduleName", moduleName)
+        doFirst {
+            options.addStringOption('-module-path', classpath.asPath)
+            options.addBooleanOption('html5', true)
         }
+        destinationDir = new File(projectDir, "docs/${version}")
+        options {
+            links "https://docs.oracle.com/javase/8/docs/api/"
+            links 'https://docs.oracle.com/javaee/7/api/'
+            links 'https://trellis-ldp.github.io/trellis/apidocs/'
+            links 'https://commons.apache.org/proper/commons-rdf/apidocs/'
+        }
+    }
 
-        licenses {
-            license {
-                name 'Apache License, Version 2.0'
-                url 'http://www.apache.org/licenses/LICENSE-2.0'
+    afterEvaluate {
+        if (subproj.name in jacocoTestProjects) {
+            jacoco {
+                applyTo subproj.tasks.matching { it.name == 'junitPlatformTest' }
             }
         }
     }
 }
 
-nexusStaging {
-    packageGroup = "cool.pandora"
-    stagingProfileId = "4d5f13c386f543"
-}
-
-nexus {
-    sign = true
-    repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
-    snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
-}
-
-javaModule {
-    name = 'cool.pandora.ldpclient'
-    extraTestModules = ['org.trellisldp.http','org.trellisldp.app']
-    hacks {
-        patches ('com.google.code.findbugs:jsr305', 'javax.annotation:jsr250-api')
-        patches ('javax.annotation:javax.annotation-api', 'org.apache.geronimo.specs:geronimo-annotation_1.2_spec')
-        patches ('org.apache.geronimo.specs:geronimo-jms_1.1_spec', 'javax.jms:javax.jms-api')
-        patches ('org.apache.httpcomponents:httpclient-osgi', 'commons-codec:commons-codec')
-        patches ('org.apache.httpcomponents:httpclient-osgi', 'org.apache.httpcomponents:httpclient')
-        patches ('org.apache.httpcomponents:httpcore', 'org.apache.httpcomponents:httpcore-osgi')
-        patches ('org.apache.jena:jena-arq', 'org.apache.jena:jena-osgi')
-        patches ('org.apache.jena:jena-core', 'org.apache.jena:jena-osgi')
-        patches ('org.apache.jena:jena-shaded-guava', 'org.apache.jena:jena-osgi')
-        patches ('org.eclipse.jetty.alpn:alpn-api', 'org.mortbay.jetty.alpn:alpn-boot')
-        patches ('org.hamcrest:hamcrest-library', 'org.hamcrest:hamcrest-core')
-        patches ('org.slf4j:log4j.over.slf4j', 'log4j:log4j')
-        patches ('org.slf4j:jcl.over.slf4j','commons-logging:commons-logging')
-        patches ('xerces:xercesImpl', 'org.apache.servicemix.bundles:org.apache.servicemix.bundles.xerces')
-        patches ('xml-apis:xml-apis', 'xerces:xercesImpl')
+configure(rootProject) {
+    task jacocoMerge(type: JacocoMerge) {
+        subprojects.findAll { it.name in jacocoTestProjects }
+                .each { subproj ->
+            executionData fileTree(dir: "${subproj.buildDir}/jacoco", include: '*.exec')
+            dependsOn subproj.tasks.withType(Test)
+        }
     }
-}
-dependencies {
 
-    patch 'commons-logging:commons-logging:1.2'
-    patch 'com.google.code.findbugs:jsr305:3.0.2'
-    patch 'log4j:log4j:1.2.17'
-    patch 'org.apache.geronimo.specs:geronimo-annotation_1.2_spec:1.0-alpha-1'
-    patch 'org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1.1'
-    patch 'org.apache.servicemix.bundles:org.apache.servicemix.bundles.xerces:2.11.0_1'
-    patch "org.apache.httpcomponents:httpclient-osgi:$httpClientOsgiVersion"
-    patch 'org.apache.httpcomponents:httpcore:4.4.6'
-    patch 'org.apache.jena:jena-shaded-guava:3.6.0'
-    patch 'org.apache.jena:jena-core:3.6.0'
-    patch 'org.apache.jena:jena-arq:3.6.0'
-    patch "org.hamcrest:hamcrest-library:$hamcrestLibraryVersion"
-    patch 'org.mortbay.jetty.alpn:alpn-boot:8.1.12.v20180117'
-    patch 'xml-apis:xml-apis:1.4.01'
-
-    compile group: 'org.apache.commons', name: 'commons-rdf-jena', version: commonsRdfVersion
-    compile group: 'org.trellisldp', name: 'trellis-vocabulary', version: trellisVersion
-    compile "javax.ws.rs:javax.ws.rs-api:${jaxrsVersion}"
-    compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
-    compile group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
-    testCompile group: 'xerces', name: 'xercesImpl', version: xerxesVersion
-    testCompile("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
-    testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
-    testCompile group: 'io.dropwizard', name: 'dropwizard-testing', version: dropwizardVersion
-    testCompile group: 'io.jsonwebtoken', name: 'jjwt', version: jsonWebTokenVersion
-    testCompile group: 'org.eclipse.jetty', name: 'jetty-alpn-java-server', version: jettyAlpnVersion
-    testCompile group: 'org.trellisldp', name: 'trellis-app', version: trellisAppVersion
-    testCompile group: 'org.trellisldp', name: 'trellis-http', version: trellisAppVersion
-    testCompile group: 'org.apache.commons', name: 'commons-rdf-jena', version: commonsRdfVersion
-    testRuntimeClasspath group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
-}
-
-jar {
-    manifest {
-        description project.description
-        docURL project.docURL
-        vendor project.vendor
-        license project.license
-
-        instruction 'Automatic-Module-Name', moduleName
-        instruction 'Import-Package', '*'
-        instruction 'Export-Package', "${moduleName};version=${projectOsgiVersion}"
-        instruction 'Require-Capability', '''\
-            osgi.extender; filter:="(osgi.extender=osgi.serviceloader.processor)",
-            osgi.serviceloader;
-                filter:="(osgi.serviceloader=org.apache.commons.rdf.api.RDF)";
-                resolution:=mandatory; cardinality:=at_least_one
-            '''
-    }
-}
-
-javadoc {
-    inputs.property("moduleName", moduleName)
-    doFirst {
-        options.addStringOption('-module-path', classpath.asPath)
-        options.addBooleanOption('html5', true)
-    }
-    destinationDir = new File(projectDir, "docs/${version}")
-    options {
-        links "https://docs.oracle.com/javase/8/docs/api/"
-        links 'https://docs.oracle.com/javaee/7/api/'
-        links 'https://trellis-ldp.github.io/trellis/apidocs/'
-        links 'https://commons.apache.org/proper/commons-rdf/apidocs/'
+    task jacocoRootReport(type: JacocoReport, dependsOn: jacocoMerge) {
+        sourceDirectories = files(subprojects
+                .findAll { it.name in jacocoTestProjects }
+                .sourceSets.main.allSource.srcDirs)
+        classDirectories = files(subprojects
+                .findAll { it.name in jacocoTestProjects }
+                .sourceSets.main.output)
+        executionData jacocoMerge.destinationFile
+        reports {
+            html.enabled = true
+            xml.enabled = true
+            csv.enabled = false
+        }
     }
 }

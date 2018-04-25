@@ -1,10 +1,10 @@
 ## Trellis Client
 
-[![Build Status](https://travis-ci.org/pan-dora/trellis-client.png?branch=master)](https://travis-ci.org/pan-dora/trellis-client)
+[![Build Status](https://travis-ci.org/trellis-ldp/trellis-client.png?branch=master)](https://travis-ci.org/trellis-ldp/trellis-client)
 
 ![Maven Central](https://img.shields.io/maven-central/v/cool.pandora/ldp-client.svg)
 
-[![codecov](https://codecov.io/gh/pan-dora/trellis-client/branch/master/graph/badge.svg)](https://codecov.io/gh/pan-dora/trellis-client)
+[![codecov](https://codecov.io/gh/trellis-ldp/trellis-client/branch/master/graph/badge.svg)](https://codecov.io/gh/trellis-ldp/trellis-client)
 
 An JDK incubator HTTP client for use with the [Trellis Linked Data Platform](https://trellis-ldp.github.io/trellis/apidocs/).
 
@@ -15,4 +15,4 @@ An JDK incubator HTTP client for use with the [Trellis Linked Data Platform](htt
     $ ./gradlew clean build
 
 ## API
-See [LDPClient](https://github.com/pan-dora/ldp-client/blob/master/src/main/java/cool/pandora/ldpclient/LdpClient.java)
+See [LDPClient](https://github.com/trellis-ldp/trellis-client/blob/master/client/src/main/java/org/trellisldp/client/LdpClient.java)

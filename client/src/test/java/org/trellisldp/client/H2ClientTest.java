@@ -17,8 +17,8 @@ package org.trellisldp.client;
 import static io.dropwizard.testing.ConfigOverride.config;
 import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
 import static javax.ws.rs.core.HttpHeaders.LINK;
-import static org.apache.jena.riot.WebContent.contentTypeJSONLD;
-import static org.apache.jena.riot.WebContent.contentTypeNTriples;
+import static org.apache.jena.arq.riot.WebContent.contentTypeJSONLD;
+import static org.apache.jena.arq.riot.WebContent.contentTypeNTriples;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.dropwizard.testing.DropwizardTestSupport;
@@ -68,8 +68,8 @@ public class H2ClientTest {
 
     @BeforeAll
     static void initAll() {
-        APP.before();
-        baseUrl = "https://localhost:8446/";
+        //APP.before();
+        baseUrl = "https://localhost:8445/";
         try {
             final SimpleSSLContext sslct = new SimpleSSLContext();
             final SSLContext sslContext = sslct.get();
@@ -81,7 +81,7 @@ public class H2ClientTest {
 
     @AfterAll
     static void tearDownAll() {
-        APP.after();
+        //APP.after();
     }
 
     @BeforeEach

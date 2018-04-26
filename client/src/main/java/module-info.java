@@ -15,10 +15,10 @@ module org.trellisldp.client {
     exports org.trellisldp.client;
     requires java.ws.rs;
     requires jdk.incubator.httpclient;
-    requires jena.core;
+    requires org.apache.jena.core;
     requires org.apache.commons.rdf.api;
     requires org.apache.commons.rdf.jena;
     requires org.apache.jena.arq;
-    requires org.trellisldp.vocabulary;
+    requires org.trellisldp.jpms.vocabulary;
     requires slf4j.api;
 }

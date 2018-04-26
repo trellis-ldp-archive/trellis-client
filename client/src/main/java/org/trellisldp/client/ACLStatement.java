@@ -14,15 +14,15 @@
 
 package org.trellisldp.client;
 
-import static org.apache.jena.riot.RDFFormat.NTRIPLES;
-import static org.apache.jena.riot.system.StreamRDFWriter.getWriterStream;
+import static org.apache.jena.arq.riot.RDFFormat.NTRIPLES;
+import static org.apache.jena.arq.riot.system.StreamRDFWriter.getWriterStream;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Set;
 import org.apache.commons.rdf.api.Graph;
 import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.jena.JenaRDF;
-import org.apache.jena.riot.system.StreamRDF;
+import org.apache.jena.arq.riot.system.StreamRDF;
 import org.trellisldp.vocabulary.ACL;
 import org.trellisldp.vocabulary.RDF;
 

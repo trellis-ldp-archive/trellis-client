@@ -32,11 +32,11 @@ import static jdk.incubator.http.HttpRequest.BodyPublisher.noBody;
 import static jdk.incubator.http.HttpResponse.BodyHandler.asByteArray;
 import static jdk.incubator.http.HttpResponse.BodyHandler.asFile;
 import static jdk.incubator.http.HttpResponse.BodyHandler.asString;
-import static org.apache.jena.riot.WebContent.contentTypeJSONLD;
-import static org.apache.jena.riot.WebContent.contentTypeNTriples;
-import static org.apache.jena.riot.WebContent.contentTypeSPARQLQuery;
-import static org.apache.jena.riot.WebContent.contentTypeSPARQLUpdate;
-import static org.apache.jena.riot.WebContent.contentTypeTurtle;
+import static org.apache.jena.arq.riot.WebContent.contentTypeJSONLD;
+import static org.apache.jena.arq.riot.WebContent.contentTypeNTriples;
+import static org.apache.jena.arq.riot.WebContent.contentTypeSPARQLQuery;
+import static org.apache.jena.arq.riot.WebContent.contentTypeSPARQLUpdate;
+import static org.apache.jena.arq.riot.WebContent.contentTypeTurtle;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.InputStream;

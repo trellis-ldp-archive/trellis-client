@@ -24,10 +24,10 @@ import static java.util.stream.Collectors.toList;
 import static javax.ws.rs.core.HttpHeaders.ACCEPT;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static javax.ws.rs.core.HttpHeaders.LINK;
-import static org.apache.jena.riot.WebContent.contentTypeJSONLD;
-import static org.apache.jena.riot.WebContent.contentTypeNTriples;
-import static org.apache.jena.riot.WebContent.contentTypeTextPlain;
-import static org.apache.jena.riot.WebContent.contentTypeTurtle;
+import static org.apache.jena.arq.riot.WebContent.contentTypeJSONLD;
+import static org.apache.jena.arq.riot.WebContent.contentTypeNTriples;
+import static org.apache.jena.arq.riot.WebContent.contentTypeTextPlain;
+import static org.apache.jena.arq.riot.WebContent.contentTypeTurtle;
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -101,9 +101,9 @@ class LdpClientTest {
 
     @BeforeAll
     static void initAll() {
-        APP.before();
-        baseUrl = "http://localhost:" + APP.getLocalPort() + "/";
-        //baseUrl = "https://localhost:8445/";
+        //APP.before();
+        //baseUrl = "http://localhost:" + APP.getLocalPort() + "/";
+        baseUrl = "http://localhost:8080/";
     }
 
     @AfterAll

@@ -68,8 +68,8 @@ public class H2ClientTest {
 
     @BeforeAll
     static void initAll() {
-        //APP.before();
-        baseUrl = "https://localhost:8445/";
+        APP.before();
+        baseUrl = "https://localhost:8446/";
         try {
             final SimpleSSLContext sslct = new SimpleSSLContext();
             final SSLContext sslContext = sslct.get();
@@ -81,7 +81,7 @@ public class H2ClientTest {
 
     @AfterAll
     static void tearDownAll() {
-        //APP.after();
+        APP.after();
     }
 
     @BeforeEach

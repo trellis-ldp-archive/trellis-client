@@ -101,9 +101,9 @@ class LdpClientTest {
 
     @BeforeAll
     static void initAll() {
-        //APP.before();
-        //baseUrl = "http://localhost:" + APP.getLocalPort() + "/";
-        baseUrl = "http://localhost:8080/";
+        APP.before();
+        baseUrl = "http://localhost:" + APP.getLocalPort() + "/";
+        //baseUrl = "http://localhost:8080/";
     }
 
     @AfterAll

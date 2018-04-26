@@ -2,8 +2,7 @@ apply plugin: 'com.zyxist.chainsaw'
 
 javaModule {
     name = 'org.trellisldp.client'
-    extraTestModules = ['org.trellisldp.http', 'org.trellisldp.id', 'org.trellisldp.app.triplestore', 'org.trellisldp' +
-            '.app']
+    extraTestModules = ['org.trellisldp.jpms.http', 'org.trellisldp.jpms.id', 'org.trellisldp.jpms.app.triplestore', 'org.trellisldp.jpms.app']
     hacks {
         patches('com.google.code.findbugs:jsr305', 'javax.annotation:jsr250-api')
         patches('javax.annotation:javax.annotation-api', 'org.apache.geronimo.specs:geronimo-annotation_1.2_spec')
@@ -14,6 +13,23 @@ javaModule {
 
 configurations {
     all {
+        exclude group: 'org.trellisldp', module: 'trellis-api'
+        exclude group: 'org.trellisldp', module: 'trellis-agent'
+        exclude group: 'org.trellisldp', module: 'trellis-app'
+        exclude group: 'org.trellisldp', module: 'trellis-audit'
+        exclude group: 'org.trellisldp', module: 'trellis-constraint-rules'
+        exclude group: 'org.trellisldp', module: 'trellis-event-serialization'
+        exclude group: 'org.trellisldp', module: 'trellis-file'
+        exclude group: 'org.trellisldp', module: 'trellis-http'
+        exclude group: 'org.trellisldp', module: 'trellis-id'
+        exclude group: 'org.trellisldp', module: 'trellis-io-jena'
+        exclude group: 'org.trellisldp', module: 'trellis-jms'
+        exclude group: 'org.trellisldp', module: 'trellis-kafka'
+        exclude group: 'org.trellisldp', module: 'trellis-namespaces'
+        exclude group: 'org.trellisldp', module: 'trellis-triplestore'
+        exclude group: 'org.trellisldp', module: 'trellis-vocabulary'
+        exclude group: 'org.trellisldp', module: 'trellis-webac'
+        exclude group: 'org.trellisldp', module: 'xml-apis'
         exclude group: 'xml-apis', module: 'xml-apis'
         exclude group: 'commons-logging', module: 'commons-logging'
         exclude group: 'org.apache.jena', module: 'jena-osgi'
@@ -63,12 +79,15 @@ dependencies {
     testImplementation("org.trellisldp:trellis-app-jpms:$trellisVersion")
     testImplementation("org.trellisldp:trellis-app-triplestore-jpms:$trellisVersion")
     testImplementation("org.trellisldp:trellis-audit-jpms:$trellisVersion")
+    testImplementation("org.trellisldp:trellis-constraint-rules-jpms:$trellisVersion")
+    testImplementation("org.trellisldp:trellis-event-serialization-jpms:$trellisVersion")
     testImplementation("org.trellisldp:trellis-file-jpms:$trellisVersion")
     testImplementation("org.trellisldp:trellis-id-jpms:$trellisVersion")
     testImplementation("org.trellisldp:trellis-io-jena-jpms:$trellisVersion")
     testImplementation("org.trellisldp:trellis-http-jpms:$trellisVersion")
     testImplementation("org.trellisldp:trellis-namespaces-jpms:$trellisVersion")
     testImplementation("org.trellisldp:trellis-triplestore-jpms:$trellisVersion")
+    testImplementation("org.trellisldp:trellis-vocabulary-jpms:$trellisVersion")
     testImplementation("org.trellisldp:trellis-webac-jpms:$trellisVersion")
 
     testRuntimeClasspath("ch.qos.logback:logback-classic:$logbackVersion")

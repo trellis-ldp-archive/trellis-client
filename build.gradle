@@ -79,7 +79,6 @@ allprojects { subproj ->
         flatDir {
             dirs "$rootProject.projectDir/lib"
         }
-
         maven {
             url "https://oss.sonatype.org/content/repositories/snapshots"
         }

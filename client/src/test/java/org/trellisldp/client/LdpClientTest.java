@@ -24,6 +24,7 @@ import static java.util.stream.Collectors.toList;
 import static javax.ws.rs.core.HttpHeaders.ACCEPT;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static javax.ws.rs.core.HttpHeaders.LINK;
+import static org.apache.commons.rdf.api.RDFSyntax.TURTLE;
 import static org.apache.jena.arq.riot.WebContent.contentTypeJSONLD;
 import static org.apache.jena.arq.riot.WebContent.contentTypeNTriples;
 import static org.apache.jena.arq.riot.WebContent.contentTypeTextPlain;
@@ -31,6 +32,9 @@ import static org.apache.jena.arq.riot.WebContent.contentTypeTurtle;
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.trellisldp.client.TestUtils.closeableFindAny;
+import static org.trellisldp.client.TestUtils.hasType;
+import static org.trellisldp.client.TestUtils.readEntityAsGraph;
 import static org.trellisldp.http.domain.HttpConstants.ACCEPT_PATCH;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -61,7 +65,9 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Link;
 
+import org.apache.commons.rdf.api.Graph;
 import org.apache.commons.rdf.api.IRI;
+import org.apache.commons.rdf.api.RDFSyntax;
 import org.apache.commons.rdf.jena.JenaRDF;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -98,12 +104,14 @@ class LdpClientTest {
     private static String baseUrl;
     private static String pid;
     private final LdpClient client = new LdpClientImpl();
+    private static InputStream testJsonResource;
 
     @BeforeAll
     static void initAll() {
         APP.before();
         baseUrl = "http://localhost:" + APP.getLocalPort() + "/";
         //baseUrl = "http://localhost:8080/";
+        testJsonResource = LdpClientTest.class.getResourceAsStream("/webanno.complete-embedded.json");
     }
 
     @AfterAll
@@ -317,6 +325,7 @@ class LdpClientTest {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
             client.put(identifier, getTestBinary(), contentTypeTextPlain);
             final byte[] bytes = client.getBinary(identifier);
+            final String out = new String(bytes);
             assertEquals(10, bytes.length);
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -369,7 +378,8 @@ class LdpClientTest {
             final String timestamp = String.valueOf(Instant.ofEpochSecond(
                     LocalDateTime.parse(date, RFC_1123_DATE_TIME).toEpochSecond(ZoneOffset.UTC)).toEpochMilli());
             final byte[] bytes = client.getBinaryVersion(identifier, timestamp);
-            assertEquals(14, bytes.length);
+            final String out = new String(bytes);
+            assertEquals("Some new data\n", out);
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -473,7 +483,9 @@ class LdpClientTest {
             //.UTF_8.toString());
             // NOTE: params with reserved characters like # (even if encoded) do not work (Incident Report 9117860).
             final String res = client.getJsonLDF(identifier, null, null, object);
-            assertEquals(137, res.length());
+            final List<Map<String, Object>> obj = MAPPER.readValue(res, new TypeReference<List<Map<String, Object>>>() {
+            });
+            assertEquals(1L, obj.size());
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -499,7 +511,8 @@ class LdpClientTest {
             client.put(aclIdentifier, new ByteArrayInputStream(acl.getACL().toByteArray()), contentTypeNTriples);
             client.putWithAuth(identifier, getTestResource(), contentTypeTurtle, token);
             final String res = client.getAcl(identifier, contentTypeNTriples);
-            assertEquals(1017, res.length());
+            Graph g = readEntityAsGraph(new ByteArrayInputStream(res.getBytes()), identifier.getIRIString(), TURTLE);
+            assertTrue(closeableFindAny(g.stream(null, ACL.accessTo, identifier)).isPresent());
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -774,11 +787,11 @@ class LdpClientTest {
         }
     }
 
-    @RepeatedTest(80)
+    @RepeatedTest(10)
     void testRepeatedH1Put() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestJsonResource(), contentTypeJSONLD);
+            client.put(identifier, testJsonResource, contentTypeJSONLD);
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }

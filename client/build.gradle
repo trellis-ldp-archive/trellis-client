@@ -2,7 +2,7 @@ apply plugin: 'com.zyxist.chainsaw'
 
 javaModule {
     name = 'org.trellisldp.client'
-    extraTestModules = ['org.trellisldp.jpms.http', 'org.trellisldp.jpms.id', 'org.trellisldp.jpms.app.triplestore', 'org.trellisldp.jpms.app']
+    extraTestModules = ['org.trellisldp.jpms.api','org.trellisldp.jpms.http', 'org.trellisldp.jpms.id', 'org.trellisldp.jpms.io', 'org.trellisldp.jpms.app.triplestore', 'org.trellisldp.jpms.app']
     hacks {
         patches('com.google.code.findbugs:jsr305', 'javax.annotation:jsr250-api')
         patches('javax.annotation:javax.annotation-api', 'org.apache.geronimo.specs:geronimo-annotation_1.2_spec')

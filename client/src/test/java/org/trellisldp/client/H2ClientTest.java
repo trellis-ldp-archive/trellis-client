@@ -94,14 +94,14 @@ public class H2ClientTest {
     }
 
     private static InputStream getTestJsonResource() {
-        return LdpClientTest.class.getResourceAsStream("/webanno.complete-embedded.json");
+        return H2ClientTest.class.getResourceAsStream("/webanno.complete-embedded.json");
     }
 
     private static InputStream getTestN3Resource() {
-        return LdpClientTest.class.getResourceAsStream("/webanno.complete.nt");
+        return H2ClientTest.class.getResourceAsStream("/webanno.complete.nt");
     }
 
-    @RepeatedTest(200)
+    @RepeatedTest(10)
     void testRepeatedPutH2N3Resource() throws Exception {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
@@ -113,7 +113,7 @@ public class H2ClientTest {
         }
     }
 
-    @RepeatedTest(200)
+    @RepeatedTest(10)
     void testRepeatedPutH2JsonResource() throws Exception {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);

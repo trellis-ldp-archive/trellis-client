@@ -193,10 +193,9 @@ subprojects { subproj ->
             options.addStringOption('-module-path', classpath.asPath)
             options.addBooleanOption('html5', true)
         }
-        destinationDir = new File(projectDir, "docs/${version}")
+        destinationDir = new File(rootDir, "docs/apidocs")
         options {
-            links "https://docs.oracle.com/javase/8/docs/api/"
-            links 'https://docs.oracle.com/javaee/7/api/'
+            links "https://docs.oracle.com/javase/10/docs/api/"
             links 'https://trellis-ldp.github.io/trellis/apidocs/'
             links 'https://commons.apache.org/proper/commons-rdf/apidocs/'
         }

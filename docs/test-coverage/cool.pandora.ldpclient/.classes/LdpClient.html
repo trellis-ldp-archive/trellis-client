@@ -1,0 +1,482 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: LdpClient</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">cool.pandora.ldpclient</a> ]
+</div>
+
+<h1>Coverage Summary for Class: LdpClient (cool.pandora.ldpclient)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">LdpClient</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/*
+<i>2</i>&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>3</i>&nbsp; * you may not use this file except in compliance with the License.
+<i>4</i>&nbsp; * You may obtain a copy of the License at
+<i>5</i>&nbsp; *
+<i>6</i>&nbsp; *     http://www.apache.org/licenses/LICENSE-2.0
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; * Unless required by applicable law or agreed to in writing, software
+<i>9</i>&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>10</i>&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>11</i>&nbsp; * See the License for the specific language governing permissions and
+<i>12</i>&nbsp; * limitations under the License.
+<i>13</i>&nbsp; */
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;package cool.pandora.ldpclient;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;import java.io.InputStream;
+<i>18</i>&nbsp;import java.nio.file.Path;
+<i>19</i>&nbsp;import java.util.List;
+<i>20</i>&nbsp;import java.util.Map;
+<i>21</i>&nbsp;import org.apache.commons.rdf.api.IRI;
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;/**
+<i>24</i>&nbsp; * LdpClient.
+<i>25</i>&nbsp; *
+<i>26</i>&nbsp; * @author christopher-johnson
+<i>27</i>&nbsp; */
+<i>28</i>&nbsp;public interface LdpClient {
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;    /**
+<i>31</i>&nbsp;     * @param identifier a resource identifier
+<i>32</i>&nbsp;     * @return Map of headers
+<i>33</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>34</i>&nbsp;     */
+<i>35</i>&nbsp;    Map&lt;String, List&lt;String&gt;&gt; head(final IRI identifier) throws LdpClientException;
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;    /**
+<i>38</i>&nbsp;     * @param identifier a resource identifier
+<i>39</i>&nbsp;     * @return body as a {@link String}
+<i>40</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>41</i>&nbsp;     */
+<i>42</i>&nbsp;    String getJson(final IRI identifier) throws LdpClientException;
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;    /**
+<i>45</i>&nbsp;     * @param identifier a resource identifier
+<i>46</i>&nbsp;     * @return body as a {@link String}
+<i>47</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>48</i>&nbsp;     */
+<i>49</i>&nbsp;    String getDefaultType(final IRI identifier) throws LdpClientException;
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;    /**
+<i>52</i>&nbsp;     * @param identifier a resource identifier
+<i>53</i>&nbsp;     * @param contentType a content type (text/turtle, application/n-triples or application/ld+json)
+<i>54</i>&nbsp;     * @return body as a {@link String}
+<i>55</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>56</i>&nbsp;     */
+<i>57</i>&nbsp;    String getWithContentType(final IRI identifier, final String contentType) throws LdpClientException;
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;    /**
+<i>60</i>&nbsp;     * @param identifier a resource identifier
+<i>61</i>&nbsp;     * @param timestamp an epoch millisecond
+<i>62</i>&nbsp;     * @return headers as a {@link Map}
+<i>63</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>64</i>&nbsp;     */
+<i>65</i>&nbsp;    Map&lt;String, List&lt;String&gt;&gt; getAcceptDatetime(final IRI identifier, String timestamp) throws LdpClientException;
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;    /**
+<i>68</i>&nbsp;     * @param identifier a resource identifier
+<i>69</i>&nbsp;     * @return body as a {@link String}
+<i>70</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>71</i>&nbsp;     */
+<i>72</i>&nbsp;    String getTimeMapLinkDefaultFormat(IRI identifier) throws LdpClientException;
+<i>73</i>&nbsp;
+<i>74</i>&nbsp;    /**
+<i>75</i>&nbsp;     * @param identifier a resource identifier
+<i>76</i>&nbsp;     * @param profile a JSON-LD profile
+<i>77</i>&nbsp;     * @return body as a {@link String}
+<i>78</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>79</i>&nbsp;     * @see &lt;a href=&quot;https://www.w3.org/ns/json-ld&quot;&gt;The JSON-LD Vocabulary&lt;/a&gt;
+<i>80</i>&nbsp;     */
+<i>81</i>&nbsp;    String getTimeMapJsonProfile(IRI identifier, String profile) throws LdpClientException;
+<i>82</i>&nbsp;
+<i>83</i>&nbsp;    /**
+<i>84</i>&nbsp;     * @param identifier a resource identifier
+<i>85</i>&nbsp;     * @param profile a JSON-LD profile
+<i>86</i>&nbsp;     * @param timestamp an epoch millisecond
+<i>87</i>&nbsp;     * @return body as a {@link String}
+<i>88</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>89</i>&nbsp;     * @see &lt;a href=&quot;https://www.w3.org/ns/json-ld&quot;&gt;The JSON-LD Vocabulary&lt;/a&gt;
+<i>90</i>&nbsp;     */
+<i>91</i>&nbsp;    String getVersionJson(IRI identifier, String profile, String timestamp) throws LdpClientException;
+<i>92</i>&nbsp;
+<i>93</i>&nbsp;    /**
+<i>94</i>&nbsp;     * @param identifier a resource identifier
+<i>95</i>&nbsp;     * @param file an output file as an {@link Path}
+<i>96</i>&nbsp;     * @return body as a {@link Path}
+<i>97</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>98</i>&nbsp;     */
+<i>99</i>&nbsp;    Path getBinary(IRI identifier, Path file) throws LdpClientException;
+<i>100</i>&nbsp;
+<i>101</i>&nbsp;    /**
+<i>102</i>&nbsp;     * @param identifier a resource identifier
+<i>103</i>&nbsp;     * @return body as a byte[]
+<i>104</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>105</i>&nbsp;     */
+<i>106</i>&nbsp;    byte[] getBinary(IRI identifier) throws LdpClientException;
+<i>107</i>&nbsp;
+<i>108</i>&nbsp;    /**
+<i>109</i>&nbsp;     * @param identifier a resource identifier
+<i>110</i>&nbsp;     * @param algorithm a digest algorithm (md5, sha, sha-256 or sha-512)
+<i>111</i>&nbsp;     * @return digest as a {@link String}
+<i>112</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>113</i>&nbsp;     */
+<i>114</i>&nbsp;    String getBinaryDigest(IRI identifier, String algorithm) throws LdpClientException;
+<i>115</i>&nbsp;
+<i>116</i>&nbsp;    /**
+<i>117</i>&nbsp;     * @param identifier a resource identifier
+<i>118</i>&nbsp;     * @param file an output file as an {@link Path}
+<i>119</i>&nbsp;     * @param timestamp an epoch millisecond
+<i>120</i>&nbsp;     * @return body as a  {@link Path}
+<i>121</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>122</i>&nbsp;     */
+<i>123</i>&nbsp;    Path getBinaryVersion(IRI identifier, Path file, String timestamp) throws LdpClientException;
+<i>124</i>&nbsp;
+<i>125</i>&nbsp;    /**
+<i>126</i>&nbsp;     * @param identifier a resource identifier
+<i>127</i>&nbsp;     * @param timestamp an epoch millisecond
+<i>128</i>&nbsp;     * @return body as a byte[]
+<i>129</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>130</i>&nbsp;     */
+<i>131</i>&nbsp;    byte[] getBinaryVersion(IRI identifier, String timestamp) throws LdpClientException;
+<i>132</i>&nbsp;
+<i>133</i>&nbsp;    /**
+<i>134</i>&nbsp;     * @param identifier a resource identifier
+<i>135</i>&nbsp;     * @param byterange a byterange
+<i>136</i>&nbsp;     * @return body as a byte[]
+<i>137</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>138</i>&nbsp;     */
+<i>139</i>&nbsp;    byte[] getRange(final IRI identifier, String byterange) throws LdpClientException;
+<i>140</i>&nbsp;
+<i>141</i>&nbsp;    /**
+<i>142</i>&nbsp;     * @param identifier a resource identifier
+<i>143</i>&nbsp;     * @param prefer an LDP preference
+<i>144</i>&nbsp;     * @return body as a {@link String}
+<i>145</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>146</i>&nbsp;     * @see &lt;a href=&quot;https://www.w3.org/TR/ldp/#prefer-parameters&quot;&gt;7.2 Preferences on the Prefer
+<i>147</i>&nbsp;     * Request Header&lt;/a&gt;
+<i>148</i>&nbsp;     */
+<i>149</i>&nbsp;    String getPrefer(final IRI identifier, String prefer) throws LdpClientException;
+<i>150</i>&nbsp;
+<i>151</i>&nbsp;    /**
+<i>152</i>&nbsp;     * @param identifier a resource identifier
+<i>153</i>&nbsp;     * @return body as a {@link String}
+<i>154</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>155</i>&nbsp;     */
+<i>156</i>&nbsp;    String getPreferServerManaged(IRI identifier) throws LdpClientException;
+<i>157</i>&nbsp;
+<i>158</i>&nbsp;    /**
+<i>159</i>&nbsp;     * @param identifier a resource identifier
+<i>160</i>&nbsp;     * @return body as a {@link String}
+<i>161</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>162</i>&nbsp;     */
+<i>163</i>&nbsp;    String getPreferMinimal(IRI identifier) throws LdpClientException;
+<i>164</i>&nbsp;
+<i>165</i>&nbsp;    /**
+<i>166</i>&nbsp;     * @param identifier a resource identifier
+<i>167</i>&nbsp;     * @param profile a JSON-LD profile
+<i>168</i>&nbsp;     * @return body as a {@link String}
+<i>169</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>170</i>&nbsp;     * @see &lt;a href=&quot;https://www.w3.org/ns/json-ld&quot;&gt;The JSON-LD Vocabulary&lt;/a&gt;
+<i>171</i>&nbsp;     */
+<i>172</i>&nbsp;    String getJsonProfile(IRI identifier, String profile) throws LdpClientException;
+<i>173</i>&nbsp;
+<i>174</i>&nbsp;    /**
+<i>175</i>&nbsp;     * @param identifier a resource identifier
+<i>176</i>&nbsp;     * @param profile a JSON-LD profile
+<i>177</i>&nbsp;     * @param subject RdfTerm as a {@link String}
+<i>178</i>&nbsp;     * @param predicate RdfTerm as a {@link String}
+<i>179</i>&nbsp;     * @param object RdfTerm as a {@link String}
+<i>180</i>&nbsp;     * @return body as a {@link String}
+<i>181</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>182</i>&nbsp;     * @see &lt;a href=&quot;https://www.w3.org/ns/json-ld&quot;&gt;The JSON-LD Vocabulary&lt;/a&gt;
+<i>183</i>&nbsp;     */
+<i>184</i>&nbsp;    String getJsonProfileLDF(IRI identifier, String profile, String subject, String predicate, String object) throws
+<i>185</i>&nbsp;            LdpClientException;
+<i>186</i>&nbsp;
+<i>187</i>&nbsp;    /**
+<i>188</i>&nbsp;     * @param identifier a resource identifier
+<i>189</i>&nbsp;     * @param subject RdfTerm as a {@link String}
+<i>190</i>&nbsp;     * @param predicate RdfTerm as a {@link String}
+<i>191</i>&nbsp;     * @param object RdfTerm as a {@link String}
+<i>192</i>&nbsp;     * @return body as a {@link String}
+<i>193</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>194</i>&nbsp;     */
+<i>195</i>&nbsp;    String getJsonLDF(IRI identifier, String subject, String predicate, String object) throws LdpClientException;
+<i>196</i>&nbsp;
+<i>197</i>&nbsp;    /**
+<i>198</i>&nbsp;     * @param identifier a resource identifier
+<i>199</i>&nbsp;     * @param contentType a content type as {@link String}
+<i>200</i>&nbsp;     * @return body as a {@link String}
+<i>201</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>202</i>&nbsp;     */
+<i>203</i>&nbsp;    String getAcl(IRI identifier, String contentType) throws LdpClientException;
+<i>204</i>&nbsp;
+<i>205</i>&nbsp;
+<i>206</i>&nbsp;    /**
+<i>207</i>&nbsp;     * @param identifier a resource identifier
+<i>208</i>&nbsp;     * @param origin a root resource identifier
+<i>209</i>&nbsp;     * @return headers as a {@link Map}
+<i>210</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>211</i>&nbsp;     */
+<i>212</i>&nbsp;    Map&lt;String, List&lt;String&gt;&gt; getCORS(final IRI identifier, final IRI origin) throws LdpClientException;
+<i>213</i>&nbsp;
+<i>214</i>&nbsp;    /**
+<i>215</i>&nbsp;     * @param identifier a resource identifier
+<i>216</i>&nbsp;     * @param origin a root resource identifier
+<i>217</i>&nbsp;     * @return headers as a {@link Map}
+<i>218</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>219</i>&nbsp;     */
+<i>220</i>&nbsp;    Map&lt;String, List&lt;String&gt;&gt; getCORSSimple(final IRI identifier, final IRI origin) throws LdpClientException;
+<i>221</i>&nbsp;
+<i>222</i>&nbsp;    /**
+<i>223</i>&nbsp;     * @param identifier a resource identifier
+<i>224</i>&nbsp;     * @param metadata a {@link Map} of headers
+<i>225</i>&nbsp;     * @return body as a {@link String}
+<i>226</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>227</i>&nbsp;     */
+<i>228</i>&nbsp;    String getWithMetadata(IRI identifier, Map&lt;String, String&gt; metadata) throws LdpClientException;
+<i>229</i>&nbsp;
+<i>230</i>&nbsp;    /**
+<i>231</i>&nbsp;     * @param identifier a resource identifier
+<i>232</i>&nbsp;     * @param metadata a {@link Map} of headers
+<i>233</i>&nbsp;     * @return body as a byte[]
+<i>234</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>235</i>&nbsp;     */
+<i>236</i>&nbsp;    byte[] getBytesWithMetadata(IRI identifier, Map&lt;String, String&gt; metadata) throws LdpClientException;
+<i>237</i>&nbsp;
+<i>238</i>&nbsp;    /**
+<i>239</i>&nbsp;     * @param identifier a resource identifier
+<i>240</i>&nbsp;     * @param metadata a {@link Map} of headers
+<i>241</i>&nbsp;     * @return body and headers as a {@link Map}
+<i>242</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>243</i>&nbsp;     */
+<i>244</i>&nbsp;    Map&lt;String, Map&lt;String, List&lt;String&gt;&gt;&gt; getResponse(final IRI identifier, final Map&lt;String, String&gt; metadata)
+<i>245</i>&nbsp;            throws LdpClientException;
+<i>246</i>&nbsp;
+<i>247</i>&nbsp;    /**
+<i>248</i>&nbsp;     * @param identifier a resource identifier
+<i>249</i>&nbsp;     * @return headers as a {@link Map}
+<i>250</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>251</i>&nbsp;     */
+<i>252</i>&nbsp;    Map&lt;String, List&lt;String&gt;&gt; options(final IRI identifier) throws LdpClientException;
+<i>253</i>&nbsp;
+<i>254</i>&nbsp;    /**
+<i>255</i>&nbsp;     * @param identifier a resource identifier
+<i>256</i>&nbsp;     * @param stream an {@link InputStream}
+<i>257</i>&nbsp;     * @param contentType a content type
+<i>258</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>259</i>&nbsp;     */
+<i>260</i>&nbsp;    void post(final IRI identifier, final InputStream stream, final String contentType) throws LdpClientException;
+<i>261</i>&nbsp;
+<i>262</i>&nbsp;    /**
+<i>263</i>&nbsp;     * @param identifier a resource identifier
+<i>264</i>&nbsp;     * @param stream an {@link InputStream}
+<i>265</i>&nbsp;     * @param metadata a {@link Map} of headers
+<i>266</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>267</i>&nbsp;     */
+<i>268</i>&nbsp;    void postWithMetadata(final IRI identifier, final InputStream stream, final Map&lt;String, String&gt; metadata) throws
+<i>269</i>&nbsp;            LdpClientException;
+<i>270</i>&nbsp;
+<i>271</i>&nbsp;    /**
+<i>272</i>&nbsp;     * @param identifier a resource identifier
+<i>273</i>&nbsp;     * @param stream an {@link InputStream}
+<i>274</i>&nbsp;     * @param contentType a content type
+<i>275</i>&nbsp;     * @param authorization an authorization token
+<i>276</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>277</i>&nbsp;     */
+<i>278</i>&nbsp;    void postWithAuth(final IRI identifier, final InputStream stream, final String contentType, final String
+<i>279</i>&nbsp;            authorization) throws LdpClientException;
+<i>280</i>&nbsp;
+<i>281</i>&nbsp;    /**
+<i>282</i>&nbsp;     * @param identifier a resource identifier
+<i>283</i>&nbsp;     * @param slug a resource name as a {@link String}
+<i>284</i>&nbsp;     * @param stream an {@link InputStream}
+<i>285</i>&nbsp;     * @param contentType a content type
+<i>286</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>287</i>&nbsp;     */
+<i>288</i>&nbsp;    void postSlug(final IRI identifier, final String slug, final InputStream stream, final String contentType) throws
+<i>289</i>&nbsp;            LdpClientException;
+<i>290</i>&nbsp;
+<i>291</i>&nbsp;    /**
+<i>292</i>&nbsp;     * @param identifier a resource identifier
+<i>293</i>&nbsp;     * @param stream an {@link InputStream}
+<i>294</i>&nbsp;     * @param contentType a content type
+<i>295</i>&nbsp;     * @param digest a digest as a {@link String}
+<i>296</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>297</i>&nbsp;     * @see &lt;a href=&quot;https://tools.ietf.org/html/rfc3230#page-9&quot;&gt;rfc3230 4.3.2 Digest&lt;/a&gt;
+<i>298</i>&nbsp;     */
+<i>299</i>&nbsp;    void postBinaryWithDigest(final IRI identifier, final InputStream stream, final String contentType, String
+<i>300</i>&nbsp;            digest) throws LdpClientException;
+<i>301</i>&nbsp;
+<i>302</i>&nbsp;    /**
+<i>303</i>&nbsp;     * @param identifier a resource identifier
+<i>304</i>&nbsp;     * @param slug a resource name as a {@link String}
+<i>305</i>&nbsp;     * @param membershipObj a membership Object identifier
+<i>306</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>307</i>&nbsp;     */
+<i>308</i>&nbsp;    void newLdpDc(final IRI identifier, final String slug, IRI membershipObj) throws LdpClientException;
+<i>309</i>&nbsp;
+<i>310</i>&nbsp;    /**
+<i>311</i>&nbsp;     * @param identifier a resource identifier
+<i>312</i>&nbsp;     * @param slug a resource name as a {@link String}
+<i>313</i>&nbsp;     * @param membershipObj a membership Object identifier
+<i>314</i>&nbsp;     * @param authorization an authorization token
+<i>315</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>316</i>&nbsp;     */
+<i>317</i>&nbsp;    void newLdpDcWithAuth(final IRI identifier, final String slug, IRI membershipObj, String authorization) throws
+<i>318</i>&nbsp;            LdpClientException;
+<i>319</i>&nbsp;
+<i>320</i>&nbsp;    /**
+<i>321</i>&nbsp;     * @param identifier a resource identifier
+<i>322</i>&nbsp;     * @param stream an {@link InputStream}
+<i>323</i>&nbsp;     * @param contentType a content type
+<i>324</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>325</i>&nbsp;     */
+<i>326</i>&nbsp;    void put(final IRI identifier, final InputStream stream, final String contentType) throws LdpClientException;
+<i>327</i>&nbsp;
+<i>328</i>&nbsp;    /**
+<i>329</i>&nbsp;     * @param identifier a resource identifier
+<i>330</i>&nbsp;     * @param stream an {@link InputStream}
+<i>331</i>&nbsp;     * @param metadata a {@link Map} of headers
+<i>332</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>333</i>&nbsp;     */
+<i>334</i>&nbsp;    void putWithMetadata(final IRI identifier, final InputStream stream, final Map&lt;String, String&gt; metadata) throws
+<i>335</i>&nbsp;            LdpClientException;
+<i>336</i>&nbsp;
+<i>337</i>&nbsp;    /**
+<i>338</i>&nbsp;     * @param identifier a resource identifier
+<i>339</i>&nbsp;     * @param stream an {@link InputStream}
+<i>340</i>&nbsp;     * @param contentType a content Type as a {@link String}
+<i>341</i>&nbsp;     * @param authorization an authorization token
+<i>342</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>343</i>&nbsp;     */
+<i>344</i>&nbsp;    void putWithAuth(final IRI identifier, final InputStream stream, final String contentType, final String
+<i>345</i>&nbsp;            authorization) throws LdpClientException;
+<i>346</i>&nbsp;
+<i>347</i>&nbsp;    /**
+<i>348</i>&nbsp;     * @param identifier a resource identifier
+<i>349</i>&nbsp;     * @param stream an {@link InputStream}
+<i>350</i>&nbsp;     * @param contentType a content type
+<i>351</i>&nbsp;     * @param etag a strong Etag as a {@link String}
+<i>352</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>353</i>&nbsp;     */
+<i>354</i>&nbsp;    void putIfMatch(final IRI identifier, final InputStream stream, final String contentType, String etag) throws
+<i>355</i>&nbsp;            LdpClientException;
+<i>356</i>&nbsp;
+<i>357</i>&nbsp;    /**
+<i>358</i>&nbsp;     * @param identifier a resource identifier
+<i>359</i>&nbsp;     * @param stream an {@link InputStream}
+<i>360</i>&nbsp;     * @param contentType a content type
+<i>361</i>&nbsp;     * @param digest a digest as a {@link String}
+<i>362</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>363</i>&nbsp;     * @see &lt;a href=&quot;https://tools.ietf.org/html/rfc3230#page-9&quot;&gt;rfc3230 4.3.2 Digest&lt;/a&gt;
+<i>364</i>&nbsp;     */
+<i>365</i>&nbsp;    void putBinaryWithDigest(final IRI identifier, final InputStream stream, final String contentType, String digest)
+<i>366</i>&nbsp;            throws LdpClientException;
+<i>367</i>&nbsp;
+<i>368</i>&nbsp;    /**
+<i>369</i>&nbsp;     * @param identifier a resource identifier
+<i>370</i>&nbsp;     * @param stream an {@link InputStream}
+<i>371</i>&nbsp;     * @param contentType a content type
+<i>372</i>&nbsp;     * @param time an RFC_1123_DATE_TIME as an {@link String}
+<i>373</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>374</i>&nbsp;     */
+<i>375</i>&nbsp;    void putIfUnmodified(final IRI identifier, final InputStream stream, final String contentType, final String time)
+<i>376</i>&nbsp;            throws LdpClientException;
+<i>377</i>&nbsp;
+<i>378</i>&nbsp;    /**
+<i>379</i>&nbsp;     * @param identifier a resource identifier
+<i>380</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>381</i>&nbsp;     */
+<i>382</i>&nbsp;    void delete(final IRI identifier) throws LdpClientException;
+<i>383</i>&nbsp;
+<i>384</i>&nbsp;    /**
+<i>385</i>&nbsp;     * @param identifier a resource identifier
+<i>386</i>&nbsp;     * @param stream an {@link InputStream}
+<i>387</i>&nbsp;     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+<i>388</i>&nbsp;     */
+<i>389</i>&nbsp;    void patch(final IRI identifier, final InputStream stream) throws LdpClientException;
+<i>390</i>&nbsp;
+<i>391</i>&nbsp;    /**
+<i>392</i>&nbsp;     * @param identifier a resource identifier
+<i>393</i>&nbsp;     */
+<i>394</i>&nbsp;    void multipartOptions(final IRI identifier);
+<i>395</i>&nbsp;
+<i>396</i>&nbsp;    /**
+<i>397</i>&nbsp;     * @param identifier a resource identifier
+<i>398</i>&nbsp;     * @param stream an {@link InputStream}
+<i>399</i>&nbsp;     */
+<i>400</i>&nbsp;    void multipartStart(final IRI identifier, final InputStream stream);
+<i>401</i>&nbsp;
+<i>402</i>&nbsp;    /**
+<i>403</i>&nbsp;     * @param identifier a resource identifier
+<i>404</i>&nbsp;     * @param sessionId a session identifier
+<i>405</i>&nbsp;     */
+<i>406</i>&nbsp;    void multipartGet(final IRI identifier, String sessionId);
+<i>407</i>&nbsp;
+<i>408</i>&nbsp;    /**
+<i>409</i>&nbsp;     * @param identifier a resource identifier
+<i>410</i>&nbsp;     * @param stream an {@link InputStream}
+<i>411</i>&nbsp;     * @param sessionId a session identifier
+<i>412</i>&nbsp;     */
+<i>413</i>&nbsp;    void multipartPut(final IRI identifier, final InputStream stream, String sessionId);
+<i>414</i>&nbsp;
+<i>415</i>&nbsp;    /**
+<i>416</i>&nbsp;     * @param identifier a resource identifier
+<i>417</i>&nbsp;     * @param stream an {@link InputStream}
+<i>418</i>&nbsp;     * @param sessionId a session identifier
+<i>419</i>&nbsp;     */
+<i>420</i>&nbsp;    void multipartPost(final IRI identifier, final InputStream stream, String sessionId);
+<i>421</i>&nbsp;
+<i>422</i>&nbsp;    /**
+<i>423</i>&nbsp;     * @param identifier a resource identifier
+<i>424</i>&nbsp;     * @param sessionId a session identifier
+<i>425</i>&nbsp;     */
+<i>426</i>&nbsp;    void multipartDelete(final IRI identifier, String sessionId);
+<i>427</i>&nbsp;
+<i>428</i>&nbsp;    /**
+<i>429</i>&nbsp;     * @param identifier a resource identifier
+<i>430</i>&nbsp;     * @param stream an {@link InputStream}
+<i>431</i>&nbsp;     * @throws LdpClientException an URISyntaxException
+<i>432</i>&nbsp;     */
+<i>433</i>&nbsp;    void asyncPut(final IRI identifier, final InputStream stream) throws LdpClientException;
+<i>434</i>&nbsp;
+<i>435</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-02-26 15:10</div>
+</div>
+</body>
+</html>

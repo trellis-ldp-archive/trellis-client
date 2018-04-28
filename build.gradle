@@ -34,25 +34,26 @@ ext {
     jaxrsVersion = '2.1'
     kafkaVersion = '1.0.0_1'
     mustacheVersion = '0.9.5_1'
-    slf4jVersion = "1.7.25"
-    trellisVersion = '0.7.0-SNAPSHOT'
-    projectOsgiVersion = project.version.replaceAll("-SNAPSHOT", ".SNAPSHOT")
+    slf4jVersion = '1.7.25'
     servicemixXercesVersion = '2.11.0_1'
     thriftVersion = '0.11.0'
+    trellisVersion = '0.7.0-SNAPSHOT'
 
     /* OSGI */
     osgiEeJavaVersion= 'osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.10))'
+    projectOsgiVersion = project.version.replaceAll("-SNAPSHOT", ".SNAPSHOT")
 
     jacocoVersion = '0.8.1'
     checkstyleVersion = '8.8'
 
     jacocoTestProjects = [
-            'client'
+            'trellis-client'
     ]
 }
 
 allprojects { subproj ->
 
+    apply plugin: 'idea'
     apply plugin: 'java'
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
@@ -204,7 +205,7 @@ subprojects { subproj ->
     afterEvaluate {
         if (subproj.name in jacocoTestProjects) {
             jacoco {
-                applyTo subproj.tasks.matching { it.name == 'junitPlatformTest' }
+                applyTo junitPlatformTest
             }
         }
     }

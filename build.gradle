@@ -40,6 +40,9 @@ ext {
     servicemixXercesVersion = '2.11.0_1'
     thriftVersion = '0.11.0'
 
+    /* OSGI */
+    osgiEeJavaVersion= 'osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.10))'
+
     jacocoVersion = '0.8.1'
     checkstyleVersion = '8.8'
 

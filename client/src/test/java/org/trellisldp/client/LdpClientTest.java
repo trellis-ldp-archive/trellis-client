@@ -787,11 +787,11 @@ class LdpClientTest {
         }
     }
 
-    @RepeatedTest(10)
+    @RepeatedTest(200)
     void testRepeatedH1Put() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, testJsonResource, contentTypeJSONLD);
+            client.put(identifier, getTestJsonResource(), contentTypeJSONLD);
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }

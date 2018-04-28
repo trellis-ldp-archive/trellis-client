@@ -1,2 +1,3 @@
 rootProject.name = 'trellis-client'
-include 'client'
+include 'trellis-client'
+project(':trellis-client').projectDir = "$rootDir/client" as File

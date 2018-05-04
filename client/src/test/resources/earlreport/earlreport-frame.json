@@ -1,0 +1,106 @@
+{
+  "@context": {
+    "@vocab": "http://www.w3.org/ns/earl#",
+    "foaf:homepage": {
+      "@type": "@id"
+    },
+    "dc": "http://purl.org/dc/terms/",
+    "doap": "http://usefulinc.com/ns/doap#",
+    "earl": "http://www.w3.org/ns/earl#",
+    "mf": "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#",
+    "foaf": "http://xmlns.com/foaf/0.1/",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "assertedBy": {
+      "@type": "@id"
+    },
+    "assertions": {
+      "@type": "@id",
+      "@container": "@list"
+    },
+    "bibRef": {
+      "@id": "dc:bibliographicCitation"
+    },
+    "created": {
+      "@id": "doap:created",
+      "@type": "xsd:date"
+    },
+    "description": {
+      "@id": "dc:description",
+      "@language": "en"
+    },
+    "developer": {
+      "@id": "doap:developer",
+      "@type": "@id",
+      "@container": "@set"
+    },
+    "doapDesc": {
+      "@id": "doap:description",
+      "@language": "en"
+    },
+    "generatedBy": {
+      "@type": "@id"
+    },
+    "homepage": {
+      "@id": "doap:homepage",
+      "@type": "@id"
+    },
+    "label": {
+      "@id": "rdfs:label",
+      "@language": "en"
+    },
+    "language": {
+      "@id": "doap:programming-language"
+    },
+    "license": {
+      "@id": "doap:license",
+      "@type": "@id"
+    },
+    "mode": {
+      "@type": "@id"
+    },
+    "name": {
+      "@id": "doap:name"
+    },
+    "outcome": {
+      "@type": "@id"
+    },
+    "release": {
+      "@id": "doap:release",
+      "@type": "@id"
+    },
+    "shortdesc": {
+      "@id": "doap:shortdesc",
+      "@language": "en"
+    },
+    "subject": {
+      "@type": "@id"
+    },
+    "test": {
+      "@type": "@id"
+    },
+    "testAction": {
+      "@id": "mf:action",
+      "@type": "@id"
+    },
+    "testResult": {
+      "@id": "mf:result",
+      "@type": "@id"
+    },
+    "entries": {
+      "@id": "mf:entries",
+      "@type": "@id",
+      "@container": "@list"
+    },
+    "testSubjects": {
+      "@type": "@id",
+      "@container": "@list"
+    },
+    "title": {
+      "@id": "dc:title"
+    },
+    "xsd": {
+      "@id": "http://www.w3.org/2001/XMLSchema#"
+    }
+  },
+  "@type": "earl:Assertion"
+}

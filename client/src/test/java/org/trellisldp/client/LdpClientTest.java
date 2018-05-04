@@ -33,7 +33,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.trellisldp.client.TestUtils.closeableFindAny;
-import static org.trellisldp.client.TestUtils.hasType;
 import static org.trellisldp.client.TestUtils.readEntityAsGraph;
 import static org.trellisldp.http.domain.HttpConstants.ACCEPT_PATCH;
 
@@ -67,15 +66,16 @@ import javax.ws.rs.core.Link;
 
 import org.apache.commons.rdf.api.Graph;
 import org.apache.commons.rdf.api.IRI;
-import org.apache.commons.rdf.api.RDFSyntax;
 import org.apache.commons.rdf.jena.JenaRDF;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 import org.trellisldp.app.config.TrellisConfiguration;
 import org.trellisldp.app.triplestore.TrellisApplication;
 import org.trellisldp.vocabulary.ACL;
@@ -90,33 +90,27 @@ import org.trellisldp.vocabulary.RDF;
  *
  * @author christopher-johnson
  */
-class LdpClientTest {
+@ExtendWith({CaptureSystemOutput.Extension.class, EarlReportExtension.class})
+class LdpClientTest extends CommonTrellisTest {
 
-    private static final DropwizardTestSupport<TrellisConfiguration> APP = new DropwizardTestSupport<>(
-            TrellisApplication.class, resourceFilePath("trellis-config.yml"),
-            config("server.applicationConnectors[0].port", "0"),
-            config("binaries", resourceFilePath("data") + "/binaries"),
-            config("mementos", resourceFilePath("data") + "/mementos"),
-            config("namespaces", resourceFilePath("data/namespaces.json")),
-            config("server.applicationConnectors[1].keyStorePath", resourceFilePath("keystore/trellis.jks")));
     private static final JenaRDF rdf = new JenaRDF();
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static String baseUrl;
     private static String pid;
     private final LdpClient client = new LdpClientImpl();
-    private static InputStream testJsonResource;
+    private final SummaryGeneratingListener listener = new SummaryGeneratingListener();
 
     @BeforeAll
     static void initAll() {
         APP.before();
         baseUrl = "http://localhost:" + APP.getLocalPort() + "/";
         //baseUrl = "http://localhost:8080/";
-        testJsonResource = LdpClientTest.class.getResourceAsStream("/webanno.complete-embedded.json");
     }
 
     @AfterAll
     static void tearDownAll() {
         APP.after();
+
     }
 
     private static InputStream getTestBinary() {
@@ -160,6 +154,7 @@ class LdpClientTest {
     void tearDown() {
     }
 
+    @DisplayName("BuildLDFQuery")
     @Test
     void testBuildLDFQuery() {
         final String subject = "http://some.annotation.resource";
@@ -172,6 +167,7 @@ class LdpClientTest {
         assertEquals("?predicate=http://www.w3.org/1999/02/22-rdf-syntax-ns#type", qp);
     }
 
+    @DisplayName("HEAD")
     @Test
     void testHead() throws LdpClientException {
         try {
@@ -183,11 +179,12 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetJSON")
     @Test
     void testGetJson() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestResource(), contentTypeTurtle);
+            assertTrue(client.putWithResponse(identifier, getTestResource(), contentTypeTurtle));
             final String res = client.getJson(identifier);
             final List<Map<String, Object>> obj = MAPPER.readValue(res, new TypeReference<List<Map<String, Object>>>() {
             });
@@ -207,11 +204,12 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetDefaultType")
     @Test
     void testGetDefaultType() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestResource(), contentTypeTurtle);
+            assertTrue(client.putWithResponse(identifier, getTestResource(), contentTypeTurtle));
             final String res = client.getDefaultType(identifier);
             assertTrue(res.contains("dc:title"));
         } catch (Exception ex) {
@@ -219,11 +217,12 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetWithContentType")
     @Test
     void testGetWithContentType() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestResource(), contentTypeTurtle);
+            assertTrue(client.putWithResponse(identifier, getTestResource(), contentTypeTurtle));
             final String res = client.getWithContentType(identifier, contentTypeNTriples);
             assertEquals(116, res.length());
         } catch (Exception ex) {
@@ -231,12 +230,13 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetAcceptDateTime")
     @Test
     void testGetAcceptDatetime() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestBinary(), contentTypeTextPlain);
-            client.put(identifier, getRevisedTestBinary(), contentTypeTextPlain);
+            assertTrue(client.putWithResponse(identifier, getTestBinary(), contentTypeTextPlain));
+            assertTrue(client.putWithResponse(identifier, getRevisedTestBinary(), contentTypeTextPlain));
             final Long timestamp = now().toEpochMilli();
             final Map<String, List<String>> res = client.getAcceptDatetime(identifier, String.valueOf(timestamp));
             final List<Link> links = res.get(LINK).stream().map(Link::valueOf).collect(toList());
@@ -246,12 +246,13 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetTimeMapLinkDefaultFormat")
     @Test
     void testGetTimeMapLinkDefaultFormat() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestBinary(), contentTypeTextPlain);
-            client.put(identifier, getRevisedTestBinary(), contentTypeTextPlain);
+            assertTrue(client.putWithResponse(identifier, getTestBinary(), contentTypeTextPlain));
+            assertTrue(client.putWithResponse(identifier, getRevisedTestBinary(), contentTypeTextPlain));
             final String res = client.getTimeMapLinkDefaultFormat(identifier);
             final List<Link> entityLinks = stream(res.split(",\n")).map(Link::valueOf).collect(toList());
             assertTrue(entityLinks.stream().findFirst().filter(l -> l.getRel().contains("timemap")).isPresent());
@@ -260,12 +261,13 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetTimeMapLinkJsonProfile")
     @Test
     void testGetTimeMapLinkJsonProfile() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestBinary(), contentTypeTextPlain);
-            client.put(identifier, getRevisedTestBinary(), contentTypeTextPlain);
+            assertTrue(client.putWithResponse(identifier, getTestBinary(), contentTypeTextPlain));
+            assertTrue(client.putWithResponse(identifier, getRevisedTestBinary(), contentTypeTextPlain));
             final String profile = JSONLD.compacted.getIRIString();
             final String res = client.getTimeMapJsonProfile(identifier, profile);
             final Map<String, Object> obj = MAPPER.readValue(res, new TypeReference<Map<String, Object>>() {
@@ -282,12 +284,13 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetVersionJson")
     @Test
     void testGetVersionJson() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestResource(), contentTypeTurtle);
-            client.put(identifier, getRevisedTestResource(), contentTypeTurtle);
+            assertTrue(client.putWithResponse(identifier, getTestResource(), contentTypeTurtle));
+            assertTrue(client.putWithResponse(identifier, getRevisedTestResource(), contentTypeTurtle));
             final List<Link> links = client.head(identifier).get(LINK).stream().map(Link::valueOf).collect(toList());
             final List<String> dates = links.stream().map(l -> l.getParams().get("datetime")).collect(
                     Collectors.toList());
@@ -305,11 +308,12 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetBinary")
     @Test
     void testGetBinary() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestBinary(), contentTypeTextPlain);
+            assertTrue(client.putWithResponse(identifier, getTestBinary(), contentTypeTextPlain));
             final Path tempDir = Files.createTempDirectory("test");
             final Path tempFile = Files.createTempFile(tempDir, "test-binary", ".txt");
             client.getBinary(identifier, tempFile);
@@ -319,11 +323,12 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetBinaryBytes")
     @Test
     void testGetBinaryBytes() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestBinary(), contentTypeTextPlain);
+            assertTrue(client.putWithResponse(identifier, getTestBinary(), contentTypeTextPlain));
             final byte[] bytes = client.getBinary(identifier);
             final String out = new String(bytes);
             assertEquals(10, bytes.length);
@@ -332,11 +337,12 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetBinaryDigest")
     @Test
     void testGetBinaryDigest() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestBinary(), contentTypeTextPlain);
+            assertTrue(client.putWithResponse(identifier, getTestBinary(), contentTypeTextPlain));
             final String digest = client.getBinaryDigest(identifier, "MD5");
             assertEquals("md5=1VOyRwUXW1CPdC5nelt7GQ==", digest);
         } catch (Exception ex) {
@@ -344,12 +350,13 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetBinaryVersion")
     @Test
     void testGetBinaryVersion() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestBinary(), contentTypeTextPlain);
-            client.put(identifier, getRevisedTestBinary(), contentTypeTextPlain);
+            assertTrue(client.putWithResponse(identifier, getTestBinary(), contentTypeTextPlain));
+            assertTrue(client.putWithResponse(identifier, getRevisedTestBinary(), contentTypeTextPlain));
             final List<Link> links = client.head(identifier).get(LINK).stream().map(Link::valueOf).collect(toList());
             final List<String> dates = links.stream().map(l -> l.getParams().get("datetime")).collect(
                     Collectors.toList());
@@ -365,12 +372,13 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetBinaryVersionBytes")
     @Test
     void testGetBinaryVersionBytes() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestBinary(), contentTypeTextPlain);
-            client.put(identifier, getRevisedTestBinary(), contentTypeTextPlain);
+            assertTrue(client.putWithResponse(identifier, getTestBinary(), contentTypeTextPlain));
+            assertTrue(client.putWithResponse(identifier, getRevisedTestBinary(), contentTypeTextPlain));
             final List<Link> links = client.head(identifier).get(LINK).stream().map(Link::valueOf).collect(toList());
             final List<String> dates = links.stream().map(l -> l.getParams().get("datetime")).collect(
                     Collectors.toList());
@@ -385,11 +393,12 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetRange")
     @Test
     void testGetRange() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestBinary(), contentTypeTextPlain);
+            assertTrue(client.putWithResponse(identifier, getTestBinary(), contentTypeTextPlain));
             final byte[] bytes = client.getRange(identifier, "bytes=3-10");
             assertEquals(7, bytes.length);
         } catch (Exception ex) {
@@ -397,6 +406,7 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetPrefer")
     @Test
     void testGetPrefer() throws LdpClientException {
         try {
@@ -405,7 +415,7 @@ class LdpClientTest {
             client.newLdpDc(identifier, slug, identifier);
             final IRI containerIri = rdf.createIRI(baseUrl + pid);
             final IRI memberIri = rdf.createIRI(baseUrl + pid + "/test-member");
-            client.put(memberIri, getTestResource(), contentTypeTurtle);
+            assertTrue(client.putWithResponse(memberIri, getTestResource(), contentTypeTurtle));
             final String prefer = "return=representation; omit=\"" + LDP.PreferContainment.getIRIString() + "\"";
             final String res = client.getPrefer(containerIri, prefer);
             assertFalse(res.contains("ldp:contains"));
@@ -414,6 +424,7 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetPreferMinimal")
     @Test
     void testGetPreferMinimal() throws LdpClientException {
         try {
@@ -422,7 +433,7 @@ class LdpClientTest {
             client.newLdpDc(identifier, slug, identifier);
             final IRI containerIri = rdf.createIRI(baseUrl + pid);
             final IRI memberIri = rdf.createIRI(baseUrl + pid + "/test-member");
-            client.put(memberIri, getTestResource(), contentTypeTurtle);
+            assertTrue(client.putWithResponse(memberIri, getTestResource(), contentTypeTurtle));
             final String res = client.getPreferMinimal(containerIri);
             assertFalse(res.contains("ldp:contains"));
         } catch (Exception ex) {
@@ -430,11 +441,12 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetJsonProfile")
     @Test
     void testGetJsonProfile() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestResource(), contentTypeTurtle);
+            assertTrue(client.putWithResponse(identifier, getTestResource(), contentTypeTurtle));
             final String profile = JSONLD.expanded.getIRIString();
             final String res = client.getJsonProfile(identifier, profile);
             assertEquals(137, res.length());
@@ -449,7 +461,7 @@ class LdpClientTest {
     void testGetCustomJsonProfile() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestJsonResource(), contentTypeJSONLD);
+            assertTrue(client.putWithResponse(identifier, getTestJsonResource(), contentTypeJSONLD));
             final String profile = "http://www.w3.org/ns/anno.jsonld";
             final String res = client.getJsonProfile(identifier, profile);
             assertTrue(res.contains("@graph"));
@@ -458,11 +470,12 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetJsonProfileLDF")
     @Test
     void testGetJsonProfileLDF() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestGraph(), contentTypeTurtle);
+            assertTrue(client.putWithResponse(identifier, getTestGraph(), contentTypeTurtle));
             final String object = URLEncoder.encode("A Body", StandardCharsets.UTF_8.toString());
             final String profile = JSONLD.compacted.getIRIString();
             // NOTE: params with reserved characters like # (even if encoded) do not work (???).
@@ -473,11 +486,12 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetJsonLDF")
     @Test
     void testGetJsonLDF() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestGraph(), contentTypeTurtle);
+            assertTrue(client.putWithResponse(identifier, getTestGraph(), contentTypeTurtle));
             final String object = URLEncoder.encode("A Body", StandardCharsets.UTF_8.toString());
             //final String predicate = URLEncoder.encode(OA.hasBody.getIRIString(), StandardCharsets
             //.UTF_8.toString());
@@ -491,6 +505,7 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetAcl")
     @Test
     void testGetAcl() throws LdpClientException {
         try {
@@ -508,7 +523,8 @@ class LdpClientTest {
             final IRI agent = rdf.createIRI("http://localhost/test-user");
             final IRI accessTo = rdf.createIRI(baseUrl + pid);
             final ACLStatement acl = new ACLStatement(modes, agent, accessTo);
-            client.put(aclIdentifier, new ByteArrayInputStream(acl.getACL().toByteArray()), contentTypeNTriples);
+            assertTrue(client.putWithResponse(aclIdentifier, new ByteArrayInputStream(acl.getACL().toByteArray()),
+                    contentTypeNTriples));
             client.putWithAuth(identifier, getTestResource(), contentTypeTurtle, token);
             final String res = client.getAcl(identifier, contentTypeNTriples);
             Graph g = readEntityAsGraph(new ByteArrayInputStream(res.getBytes()), identifier.getIRIString(), TURTLE);
@@ -518,12 +534,13 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetCORS")
     @Test
     void testGetCORS() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
             final IRI origin = rdf.createIRI(baseUrl);
-            client.put(identifier, getTestGraph(), contentTypeTurtle);
+            assertTrue(client.putWithResponse(identifier, getTestGraph(), contentTypeTurtle));
             final Map<String, List<String>> headers = client.getCORS(identifier, origin);
             assertTrue(headers.containsKey("Access-Control-Expose-Headers"));
         } catch (Exception ex) {
@@ -531,12 +548,13 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetCORSSimple")
     @Test
     void testGetCORSSimple() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
             final IRI origin = rdf.createIRI(baseUrl);
-            client.put(identifier, getTestGraph(), contentTypeTurtle);
+            assertTrue(client.putWithResponse(identifier, getTestGraph(), contentTypeTurtle));
             final Map<String, List<String>> headers = client.getCORSSimple(identifier, origin);
             assertTrue(headers.containsKey("Access-Control-Allow-Origin"));
         } catch (Exception ex) {
@@ -544,6 +562,7 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetWithMetadata")
     @Test
     void testGetWithMetadata() throws LdpClientException {
         try {
@@ -559,11 +578,12 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetBytesWithMetadata")
     @Test
     void testGetBytesWithMetadata() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestGraph(), contentTypeTurtle);
+            assertTrue(client.putWithResponse(identifier, getTestGraph(), contentTypeTurtle));
             final Map<String, String> metadata = new HashMap<>();
             metadata.put("Prefer", "return=representation; omit=\"" + LDP.PreferContainment.getIRIString() + "\"");
             metadata.put(ACCEPT, contentTypeJSONLD);
@@ -574,11 +594,12 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("GetResponse")
     @Test
     void testGetResponse() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestGraph(), contentTypeTurtle);
+            assertTrue(client.putWithResponse(identifier, getTestGraph(), contentTypeTurtle));
             final Map<String, String> metadata = new HashMap<>();
             metadata.put("Prefer", "return=representation; omit=\"" + LDP.PreferContainment.getIRIString() + "\"");
             metadata.put(ACCEPT, contentTypeJSONLD);
@@ -597,11 +618,12 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("OPTIONS")
     @Test
     void testOptions() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestGraph(), contentTypeTurtle);
+            assertTrue(client.putWithResponse(identifier, getTestGraph(), contentTypeTurtle));
             final Map<String, List<String>> headers = client.options(identifier);
             assertTrue(headers.containsKey("Allow"));
         } catch (Exception ex) {
@@ -609,6 +631,7 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("POST")
     @Test
     void testPost() throws LdpClientException {
         try {
@@ -621,6 +644,7 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("PostWithMetadata")
     @Test
     void testPostWithMetadata() throws LdpClientException {
         try {
@@ -636,6 +660,7 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("PostWithAuth")
     @Test
     void testPostWithAuth() throws LdpClientException {
         try {
@@ -653,6 +678,7 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("PostSlug")
     @Test
     void testPostSlug() throws LdpClientException {
         try {
@@ -666,6 +692,7 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("PostBinarywithDigest")
     @Test
     void testPostBinarywithDigest() throws LdpClientException {
         try {
@@ -679,6 +706,7 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("NewLdpDc")
     @Test
     void testNewLdpDc() throws LdpClientException {
         try {
@@ -690,6 +718,7 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("NewLdpDcWithAuth")
     @Test
     void testNewLdpDcWithAuth() throws LdpClientException {
         try {
@@ -706,6 +735,7 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("PutWithFalseResponse")
     @Test
     void testPutWithFalseResponse() throws LdpClientException {
         try {
@@ -717,6 +747,7 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("PutWithMetadata")
     @Test
     void testPutWithMetadata() throws LdpClientException {
         try {
@@ -724,25 +755,27 @@ class LdpClientTest {
             final Map<String, String> metadata = new HashMap<>();
             metadata.put(CONTENT_TYPE, contentTypeTurtle);
             metadata.put("Etag", "053036f0a8a95b3ecf4fee30b9c3145f");
-            client.put(identifier, getTestResource(), contentTypeTurtle);
+            assertTrue(client.putWithResponse(identifier, getTestResource(), contentTypeTurtle));
             client.putWithMetadata(identifier, getRevisedTestResource(), metadata);
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
     }
 
+    @DisplayName("PutIfMatch")
     @Test
     void testPutIfMatch() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
             final String etag = "053036f0a8a95b3ecf4fee30b9c3145f";
-            client.put(identifier, getTestResource(), contentTypeTurtle);
+            assertTrue(client.putWithResponse(identifier, getTestResource(), contentTypeTurtle));
             client.putIfMatch(identifier, getRevisedTestResource(), contentTypeTurtle, etag);
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
     }
 
+    @DisplayName("PutBinarywithDigest")
     @Test
     void testPutBinarywithDigest() throws LdpClientException {
         try {
@@ -754,6 +787,7 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("PutIfUnmodified")
     @Test
     void testPutIfUnmodified() throws LdpClientException {
         try {
@@ -765,36 +799,27 @@ class LdpClientTest {
         }
     }
 
+    @DisplayName("Delete")
     @Test
     void testDelete() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestBinary(), contentTypeTextPlain);
+            assertTrue(client.putWithResponse(identifier, getTestBinary(), contentTypeTextPlain));
             client.delete(identifier);
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
     }
 
+    @DisplayName("Patch")
     @Test
     void testPatch() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestResource(), contentTypeTurtle);
+            assertTrue(client.putWithResponse(identifier, getTestResource(), contentTypeTurtle));
             client.patch(identifier, getSparqlUpdate());
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
     }
-
-    @RepeatedTest(200)
-    void testRepeatedH1Put() throws LdpClientException {
-        try {
-            final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestJsonResource(), contentTypeJSONLD);
-        } catch (Exception ex) {
-            throw new LdpClientException(ex.toString(), ex.getCause());
-        }
-    }
-
 }

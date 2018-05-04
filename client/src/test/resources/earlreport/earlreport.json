@@ -1,0 +1,66 @@
+{
+  "@context": {
+    "dc": "http://purl.org/dc/terms/",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "@graph": [
+    {
+      "@id": "http://w3c.github.io/ldp-testsuite",
+      "@type": "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#Manifest",
+      "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#entries": {
+        "@list": [
+          {
+            "@id": "http://w3c.github.io/ldp-testsuite#tc1"
+          },
+          {
+            "@id": "http://w3c.github.io/ldp-testsuite#tc2"
+          }
+        ]
+      },
+      "rdfs:comment": "LDP tests"
+    },
+    {
+      "@id": "http://w3c.github.io/ldp-testsuite#tc1",
+      "@type": "http://www.w3.org/ns/earl#TestCase",
+      "dc:date": {
+        "@type": "xsd:dateTime",
+        "@value": "2014-06-19T19:34:33.703Z"
+      },
+      "dc:description": "Declaring Class: org.w3.ldp.testsuite.test.BasicContainerTest - LDP servers that successfully create a resource from a RDF representation in the request entity body MUST honor the client's requested interaction model(s). The created resource can be thought of as an RDF named graph [rdf11-concepts]. If any model cannot be honored, the server MUST fail the request.",
+      "dc:subject": "Groups: MUST",
+      "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#action": {
+        "@id": "http://w3c.github.io/ldp-testsuite#test-1"
+      },
+      "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#name": "BasicContainerTest1",
+      "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result": {
+        "@id": "http://w3c.github.io/ldp-testsuite#result-1"
+      },
+      "http://www.w3.org/ns/rdftest#approval": {
+        "@id": "http://www.w3.org/ns/rdftest#Approved"
+      },
+      "rdfs:comment": "Declaring Class: org.w3.ldp.testsuite.test.BasicContainerTest - LDP servers that successfully create a resource from a RDF representation in the request entity body MUST honor the client's requested interaction model(s). The created resource can be thought of as an RDF named graph [rdf11-concepts]."
+    },
+    {
+      "@id": "http://w3c.github.io/ldp-testsuite#tc2",
+      "@type": "http://www.w3.org/ns/earl#TestCase",
+      "dc:date": {
+        "@type": "xsd:dateTime",
+        "@value": "2014-06-19T19:34:33.698Z"
+      },
+      "dc:description": "Declaring Class: org.w3.ldp.testsuite.test.BasicContainerTest - LDP servers that successfully create a resource from a RDF representation in the request entity body MUST honor the client's requested interaction model(s). The created resource can be thought of as an RDF named graph [rdf11-concepts]. If any model cannot be honored, the server MUST fail the request.",
+      "dc:subject": "Groups: MUST",
+      "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#action": {
+        "@id": "http://w3c.github.io/ldp-testsuite#test-2"
+      },
+      "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#name": "BasicContainerTest2",
+      "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result": {
+        "@id": "http://w3c.github.io/ldp-testsuite#result-2"
+      },
+      "http://www.w3.org/ns/rdftest#approval": {
+        "@id": "http://www.w3.org/ns/rdftest#Approved"
+      },
+      "rdfs:comment": "Declaring Class: org.w3.ldp.testsuite.test.BasicContainerTest - LDP servers that successfully create a resource from a RDF representation in the request entity body MUST honor the client's requested interaction model(s). The created resource can be thought of as an RDF named graph [rdf11-concepts]."
+    }
+  ]
+}

@@ -727,7 +727,7 @@ public class LdpClientImpl implements LdpClient {
             final HttpResponse<String> response = client.send(req, asString());
             log.info(String.valueOf(response.version()) + " PUT request to {} returned {}", identifier, String
                     .valueOf(response.statusCode()));
-            return response.statusCode() == 204;
+            return response.statusCode() == 204 || response.statusCode() == 201;
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }

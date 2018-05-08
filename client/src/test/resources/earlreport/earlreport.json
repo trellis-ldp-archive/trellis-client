@@ -1,66 +1,719 @@
 {
-  "@context": {
-    "dc": "http://purl.org/dc/terms/",
-    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  "@context" : {
+    "@vocab" : "http://www.w3.org/ns/earl#",
+    "foaf" : "http://xmlns.com/foaf/0.1/",
+    "foaf:homepage" : {
+      "@type" : "@id"
+    },
+    "dc" : "http://purl.org/dc/terms/",
+    "doap" : "http://usefulinc.com/ns/doap#",
+    "earl" : "http://www.w3.org/ns/earl#",
+    "mf" : "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#",
+    "rdfs" : "http://www.w3.org/2000/01/rdf-schema#",
+    "assertedBy" : {
+      "@id" : "earl:assertedBy",
+      "@type" : "@id"
+    },
+    "assertions" : {
+      "@id" : "earl:assertions",
+      "@type" : "@id",
+      "@container" : "@list"
+    },
+    "bibRef" : "dc:bibliographicCitation",
+    "xsd" : "http://www.w3.org/2001/XMLSchema#",
+    "created" : {
+      "@id" : "doap:created",
+      "@type" : "xsd:date"
+    },
+    "description" : {
+      "@id" : "dc:description",
+      "@language" : "en"
+    },
+    "developer" : {
+      "@id" : "doap:developer",
+      "@type" : "@id",
+      "@container" : "@set"
+    },
+    "doapDesc" : {
+      "@id" : "doap:description",
+      "@language" : "en"
+    },
+    "generatedBy" : {
+      "@id" : "earl:generatedBy",
+      "@type" : "@id"
+    },
+    "homepage" : {
+      "@id" : "doap:homepage",
+      "@type" : "@id"
+    },
+    "label" : {
+      "@id" : "rdfs:label",
+      "@language" : "en"
+    },
+    "language" : "doap:programming-language",
+    "license" : {
+      "@id" : "doap:license",
+      "@type" : "@id"
+    },
+    "mode" : {
+      "@id" : "earl:mode",
+      "@type" : "@id"
+    },
+    "name" : "doap:name",
+    "outcome" : {
+      "@id" : "earl:outcome",
+      "@type" : "@id"
+    },
+    "release" : {
+      "@id" : "doap:release",
+      "@type" : "@id"
+    },
+    "shortdesc" : {
+      "@id" : "doap:shortdesc",
+      "@language" : "en"
+    },
+    "subject" : {
+      "@id" : "earl:subject",
+      "@type" : "@id"
+    },
+    "test" : {
+      "@id" : "earl:test",
+      "@type" : "@id"
+    },
+    "testAction" : {
+      "@id" : "mf:action",
+      "@type" : "@id"
+    },
+    "testResult" : {
+      "@id" : "mf:result",
+      "@type" : "@id"
+    },
+    "entries" : {
+      "@id" : "mf:entries",
+      "@type" : "@id",
+      "@container" : "@list"
+    },
+    "testSubjects" : {
+      "@id" : "test:Subjects",
+      "@type" : "@id",
+      "@container" : "@list"
+    },
+    "title" : "dc:title"
   },
-  "@graph": [
-    {
-      "@id": "http://w3c.github.io/ldp-testsuite",
-      "@type": "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#Manifest",
-      "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#entries": {
-        "@list": [
-          {
-            "@id": "http://w3c.github.io/ldp-testsuite#tc1"
-          },
-          {
-            "@id": "http://w3c.github.io/ldp-testsuite#tc2"
-          }
-        ]
-      },
-      "rdfs:comment": "LDP tests"
-    },
-    {
-      "@id": "http://w3c.github.io/ldp-testsuite#tc1",
-      "@type": "http://www.w3.org/ns/earl#TestCase",
-      "dc:date": {
-        "@type": "xsd:dateTime",
-        "@value": "2014-06-19T19:34:33.703Z"
-      },
-      "dc:description": "Declaring Class: org.w3.ldp.testsuite.test.BasicContainerTest - LDP servers that successfully create a resource from a RDF representation in the request entity body MUST honor the client's requested interaction model(s). The created resource can be thought of as an RDF named graph [rdf11-concepts]. If any model cannot be honored, the server MUST fail the request.",
-      "dc:subject": "Groups: MUST",
-      "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#action": {
-        "@id": "http://w3c.github.io/ldp-testsuite#test-1"
-      },
-      "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#name": "BasicContainerTest1",
-      "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result": {
-        "@id": "http://w3c.github.io/ldp-testsuite#result-1"
-      },
-      "http://www.w3.org/ns/rdftest#approval": {
-        "@id": "http://www.w3.org/ns/rdftest#Approved"
-      },
-      "rdfs:comment": "Declaring Class: org.w3.ldp.testsuite.test.BasicContainerTest - LDP servers that successfully create a resource from a RDF representation in the request entity body MUST honor the client's requested interaction model(s). The created resource can be thought of as an RDF named graph [rdf11-concepts]."
-    },
-    {
-      "@id": "http://w3c.github.io/ldp-testsuite#tc2",
-      "@type": "http://www.w3.org/ns/earl#TestCase",
-      "dc:date": {
-        "@type": "xsd:dateTime",
-        "@value": "2014-06-19T19:34:33.698Z"
-      },
-      "dc:description": "Declaring Class: org.w3.ldp.testsuite.test.BasicContainerTest - LDP servers that successfully create a resource from a RDF representation in the request entity body MUST honor the client's requested interaction model(s). The created resource can be thought of as an RDF named graph [rdf11-concepts]. If any model cannot be honored, the server MUST fail the request.",
-      "dc:subject": "Groups: MUST",
-      "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#action": {
-        "@id": "http://w3c.github.io/ldp-testsuite#test-2"
-      },
-      "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#name": "BasicContainerTest2",
-      "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result": {
-        "@id": "http://w3c.github.io/ldp-testsuite#result-2"
-      },
-      "http://www.w3.org/ns/rdftest#approval": {
-        "@id": "http://www.w3.org/ns/rdftest#Approved"
-      },
-      "rdfs:comment": "Declaring Class: org.w3.ldp.testsuite.test.BasicContainerTest - LDP servers that successfully create a resource from a RDF representation in the request entity body MUST honor the client's requested interaction model(s). The created resource can be thought of as an RDF named graph [rdf11-concepts]."
+  "@graph" : [ {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#BuildLDFQuery-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b22",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:27.033414",
+      "dc:description" : "BuildLDFQuery",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#BuildLDFQuery"
     }
-  ]
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#Delete-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b8",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:28.557928",
+      "dc:description" : "Delete",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#Delete"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetAcceptDateTime-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b4",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:28.987828",
+      "dc:description" : "GetAcceptDateTime",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetAcceptDateTime"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetAcl-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b19",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:28.653919",
+      "dc:description" : "GetAcl",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetAcl"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetBinary-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b1",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:28.360168",
+      "dc:description" : "GetBinary",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetBinary"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetBinaryBytes-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b12",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:28.303710",
+      "dc:description" : "GetBinaryBytes",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetBinaryBytes"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetBinaryDigest-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b26",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:28.422816",
+      "dc:description" : "GetBinaryDigest",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetBinaryDigest"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetBinaryVersion-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b20",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:28.061394",
+      "dc:description" : "GetBinaryVersion",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetBinaryVersion"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetBinaryVersionBytes-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b10",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:27.489098",
+      "dc:description" : "GetBinaryVersionBytes",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetBinaryVersionBytes"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetBytesWithMetadata-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b7",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:27.988609",
+      "dc:description" : "GetBytesWithMetadata",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetBytesWithMetadata"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetCORS-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b14",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:27.887306",
+      "dc:description" : "GetCORS",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetCORS"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetCORSSimple-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b5",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:26.733713",
+      "dc:description" : "GetCORSSimple",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetCORSSimple"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetDefaultType-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b0",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:29.039708",
+      "dc:description" : "GetDefaultType",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetDefaultType"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetJSON-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b32",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:27.937866",
+      "dc:description" : "GetJSON",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetJSON"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetJsonLDF-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b17",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:27.621684",
+      "dc:description" : "GetJsonLDF",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetJsonLDF"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetJsonProfile-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b38",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:28.255268",
+      "dc:description" : "GetJsonProfile",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetJsonProfile"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetJsonProfileLDF-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b33",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:26.664426",
+      "dc:description" : "GetJsonProfileLDF",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetJsonProfileLDF"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetPrefer-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b16",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:28.732313",
+      "dc:description" : "GetPrefer",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetPrefer"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetPreferMinimal-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b36",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:27.574183",
+      "dc:description" : "GetPreferMinimal",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetPreferMinimal"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetRange-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b15",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:26.909041",
+      "dc:description" : "GetRange",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetRange"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetResponse-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b39",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:28.493646",
+      "dc:description" : "GetResponse",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetResponse"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetTimeMapLinkDefaultFormat-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b6",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:27.105726",
+      "dc:description" : "GetTimeMapLinkDefaultFormat",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetTimeMapLinkDefaultFormat"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetTimeMapLinkJsonProfile-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b34",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:26.505242",
+      "dc:description" : "GetTimeMapLinkJsonProfile",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetTimeMapLinkJsonProfile"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetVersionJson-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b24",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:27.210481",
+      "dc:description" : "GetVersionJson",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetVersionJson"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetWithContentType-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b21",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:28.905238",
+      "dc:description" : "GetWithContentType",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetWithContentType"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetWithMetadata-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b29",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:27.721484",
+      "dc:description" : "GetWithMetadata",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#GetWithMetadata"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#HEAD-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b3",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:27.337179",
+      "dc:description" : "HEAD",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#HEAD"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#NewLdpDc-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b25",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:29.157872",
+      "dc:description" : "NewLdpDc",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#NewLdpDc"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#NewLdpDcWithAuth-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b28",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:28.206445",
+      "dc:description" : "NewLdpDcWithAuth",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#NewLdpDcWithAuth"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#OPTIONS-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b30",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:26.835379",
+      "dc:description" : "OPTIONS",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#OPTIONS"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#POST-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b27",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:27.399484",
+      "dc:description" : "POST",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#POST"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#Patch-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b35",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:27.307829",
+      "dc:description" : "Patch",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#Patch"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#PostBinarywithDigest-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b40",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:27.021352",
+      "dc:description" : "PostBinarywithDigest",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#PostBinarywithDigest"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#PostSlug-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b18",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:28.851878",
+      "dc:description" : "PostSlug",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#PostSlug"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#PostWithAuth-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b37",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:27.834635",
+      "dc:description" : "PostWithAuth",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#PostWithAuth"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#PostWithMetadata-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b2",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:29.109018",
+      "dc:description" : "PostWithMetadata",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#PostWithMetadata"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#PutBinarywithDigest-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b9",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:26.778320",
+      "dc:description" : "PutBinarywithDigest",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#PutBinarywithDigest"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#PutIfMatch-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b11",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:28.790678",
+      "dc:description" : "PutIfMatch",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#PutIfMatch"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#PutIfUnmodified-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b23",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:27.661105",
+      "dc:description" : "PutIfUnmodified",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#PutIfUnmodified"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#PutWithFalseResponse-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b13",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:26.558877",
+      "dc:description" : "PutWithFalseResponse",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#PutWithFalseResponse"
+    }
+  }, {
+    "@id" : "https://github.com/trellis-ldp/trellis-client/testsuite#PutWithMetadata-result",
+    "@type" : "Assertion",
+    "assertedBy" : "https://github.com/trellis-ldp/trellis-client",
+    "mode" : "earl:automatic",
+    "result" : {
+      "@id" : "_:b31",
+      "@type" : "TestResult",
+      "dc:date" : "2018-05-04T16:01:28.161465",
+      "dc:description" : "PutWithMetadata",
+      "title" : "TEST PASSED",
+      "outcome" : "earl:pass",
+      "subject" : "https://github.com/trellis-ldp/trellis-client",
+      "test" : "https://github.com/trellis-ldp/trellis-client/testsuite#PutWithMetadata"
+    }
+  } ]
 }

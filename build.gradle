@@ -30,7 +30,7 @@ ext {
     jettyAlpnVersion = '9.4.8.v20171121'
     jsonldVersion = '0.12.0'
     jsonWebTokenVersion = '0.9.0'
-    junitVersion = '5.1.0'
+    junitVersion = '5.2.0'
     logbackVersion = '1.2.3'
     jaxrsVersion = '2.1'
     kafkaVersion = '1.0.0_1'
@@ -87,6 +87,19 @@ allprojects { subproj ->
         }
         maven {
             url "https://oss.sonatype.org/content/repositories/snapshots"
+        }
+    }
+
+    configurations {
+        all {
+            resolutionStrategy {
+                force "de.ubleipzig:jena.arq-jpms:$jenaVersion"
+                force "de.ubleipzig:jena.base-jpms:$jenaVersion"
+                force "de.ubleipzig:jena.core-jpms:$jenaVersion"
+                force "de.ubleipzig:jena.iri-jpms:$jenaVersion"
+                force "de.ubleipzig:jena.rdfconnection-jpms:$jenaVersion"
+                cacheChangingModulesFor 0, 'seconds'
+            }
         }
     }
 

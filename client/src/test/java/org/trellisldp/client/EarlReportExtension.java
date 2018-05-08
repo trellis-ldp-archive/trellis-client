@@ -32,6 +32,7 @@ import java.util.Objects;
 
 import org.apache.commons.rdf.api.BlankNode;
 import org.apache.commons.rdf.api.Graph;
+import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.jena.JenaRDF;
 import org.apache.jena.arq.riot.JsonLDWriteContext;
 import org.apache.jena.arq.riot.RDFDataMgr;
@@ -40,6 +41,7 @@ import org.apache.jena.arq.riot.system.PrefixMap;
 import org.apache.jena.arq.riot.system.RiotLib;
 import org.apache.jena.arq.sparql.core.DatasetGraph;
 import org.apache.jena.arq.sparql.core.DatasetGraphFactory;
+import org.apache.jena.core.vocabulary.RDFTest;
 import org.apache.jena.core.vocabulary.TestManifest;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
@@ -56,7 +58,6 @@ public class EarlReportExtension implements BeforeTestExecutionCallback, AfterTe
     private static String project = "https://github.com/trellis-ldp/trellis-client";
     private static String testNamespace = "https://github.com/trellis-ldp/trellis-client/testsuite#";
     private static String earlNamespace = "http://www.w3.org/ns/earl#";
-    private static String rdfTestNamespace = "https://www.w3.org/ns/rdftest#";
 
     public static Graph buildTestSuite() {
         graph.add(rdf.createIRI(testSuite), RDF.type, rdf.createIRI(TestManifest.Manifest.getURI()));
@@ -75,8 +76,8 @@ public class EarlReportExtension implements BeforeTestExecutionCallback, AfterTe
                 rdf.createIRI(testNamespace + testName));
         graph.add(rdf.createIRI(testNamespace + testName), rdf.createIRI(TestManifest.result.getURI()),
                 rdf.createIRI(testNamespace + testName + "-result"));
-        graph.add(rdf.createIRI(testNamespace + testName), rdf.createIRI(rdfTestNamespace + "approval"),
-                rdf.createIRI(rdfTestNamespace + "Approved"));
+        graph.add(rdf.createIRI(testNamespace + testName), (IRI) rdf.asRDFTerm(RDFTest.approval.asNode()),
+                rdf.createIRI(RDFTest.getURI() + "Approved"));
         return graph;
     }
 
@@ -147,12 +148,13 @@ public class EarlReportExtension implements BeforeTestExecutionCallback, AfterTe
         } else {
             testOutcome = "TEST PASSED";
         }
-        Graph g = buildTestAssertion(context.getDisplayName(), context.getDisplayName(), testOutcome);
+        Graph g = buildTestAssertion(
+                context.getDisplayName(), Objects.requireNonNull(context.getTestClass().orElse(null)).toString(),
+                testOutcome);
         OutputStream out = null;
         try {
             final String dir = new File(
                     getClass().getResource("/earlreport/earlreport.json").getFile()).getParentFile().getPath();
-            System.out.println(dir);
             out = new FileOutputStream(dir + "/earlreport.json");
         } catch (FileNotFoundException e) {
             e.printStackTrace();

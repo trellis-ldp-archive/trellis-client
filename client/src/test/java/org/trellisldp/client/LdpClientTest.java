@@ -14,8 +14,6 @@
 
 package org.trellisldp.client;
 
-import static io.dropwizard.testing.ConfigOverride.config;
-import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
 import static java.time.Instant.now;
 import static java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME;
 import static java.util.Arrays.stream;
@@ -39,7 +37,6 @@ import static org.trellisldp.http.domain.HttpConstants.ACCEPT_PATCH;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.dropwizard.testing.DropwizardTestSupport;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -53,6 +50,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -76,8 +74,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
-import org.trellisldp.app.config.TrellisConfiguration;
-import org.trellisldp.app.triplestore.TrellisApplication;
 import org.trellisldp.vocabulary.ACL;
 import org.trellisldp.vocabulary.DC;
 import org.trellisldp.vocabulary.JSONLD;
@@ -104,7 +100,7 @@ class LdpClientTest extends CommonTrellisTest {
     static void initAll() {
         APP.before();
         baseUrl = "http://localhost:" + APP.getLocalPort() + "/";
-        //baseUrl = "http://localhost:8080/";
+        //baseUrl = "http://localhost:8000/";
     }
 
     @AfterAll
@@ -224,7 +220,8 @@ class LdpClientTest extends CommonTrellisTest {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
             assertTrue(client.putWithResponse(identifier, getTestResource(), contentTypeTurtle));
             final String res = client.getWithContentType(identifier, contentTypeNTriples);
-            assertEquals(116, res.length());
+            Graph g = readEntityAsGraph(new ByteArrayInputStream(res.getBytes()), identifier.getIRIString(), TURTLE);
+            assertTrue(closeableFindAny(g.stream(null, DC.title, rdf.createLiteral("A title"))).isPresent());
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -278,7 +275,7 @@ class LdpClientTest extends CommonTrellisTest {
             final List<Map<String, Object>> graph = (List<Map<String, Object>>) obj.get("@graph");
             assertTrue(graph.stream().anyMatch(
                     x -> x.containsKey("@id") && x.get("@id").equals(baseUrl + pid) && x.containsKey("timegate")
-                            && x.containsKey("timemap") && x.containsKey("memento:memento")));
+                            && x.containsKey("timemap")));
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -294,9 +291,9 @@ class LdpClientTest extends CommonTrellisTest {
             final List<Link> links = client.head(identifier).get(LINK).stream().map(Link::valueOf).collect(toList());
             final List<String> dates = links.stream().map(l -> l.getParams().get("datetime")).collect(
                     Collectors.toList());
-            final String date = dates.stream().filter(Objects::nonNull).findFirst().orElse("");
-            final String timestamp = String.valueOf(Instant.ofEpochSecond(
-                    LocalDateTime.parse(date, RFC_1123_DATE_TIME).toEpochSecond(ZoneOffset.UTC)).toEpochMilli());
+            final String date = dates.stream().filter(Objects::nonNull).max(
+                    Comparator.comparing(this::getTimestamp)).orElse("");
+            final String timestamp = getTimestamp(date);
             final String profile = JSONLD.compacted.getIRIString();
             final String res = client.getVersionJson(identifier, profile, timestamp);
             final Map<String, Object> obj = MAPPER.readValue(res, new TypeReference<Map<String, Object>>() {
@@ -306,6 +303,11 @@ class LdpClientTest extends CommonTrellisTest {
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
+    }
+
+    private String getTimestamp(String date) {
+        return String.valueOf(Instant.ofEpochSecond(
+                LocalDateTime.parse(date, RFC_1123_DATE_TIME).toEpochSecond(ZoneOffset.UTC)).toEpochMilli());
     }
 
     @DisplayName("GetBinary")
@@ -360,9 +362,9 @@ class LdpClientTest extends CommonTrellisTest {
             final List<Link> links = client.head(identifier).get(LINK).stream().map(Link::valueOf).collect(toList());
             final List<String> dates = links.stream().map(l -> l.getParams().get("datetime")).collect(
                     Collectors.toList());
-            final String date = dates.stream().filter(Objects::nonNull).findFirst().orElse("");
-            final String timestamp = String.valueOf(Instant.ofEpochSecond(
-                    LocalDateTime.parse(date, RFC_1123_DATE_TIME).toEpochSecond(ZoneOffset.UTC)).toEpochMilli());
+            final String date = dates.stream().filter(Objects::nonNull).max(
+                    Comparator.comparing(this::getTimestamp)).orElse("");
+            final String timestamp = getTimestamp(date);
             final Path tempDir = Files.createTempDirectory("test");
             final Path tempFile = Files.createTempFile(tempDir, "test-binary", ".txt");
             client.getBinaryVersion(identifier, tempFile, timestamp);
@@ -382,9 +384,9 @@ class LdpClientTest extends CommonTrellisTest {
             final List<Link> links = client.head(identifier).get(LINK).stream().map(Link::valueOf).collect(toList());
             final List<String> dates = links.stream().map(l -> l.getParams().get("datetime")).collect(
                     Collectors.toList());
-            final String date = dates.stream().filter(Objects::nonNull).findFirst().orElse("");
-            final String timestamp = String.valueOf(Instant.ofEpochSecond(
-                    LocalDateTime.parse(date, RFC_1123_DATE_TIME).toEpochSecond(ZoneOffset.UTC)).toEpochMilli());
+            final String date = dates.stream().filter(Objects::nonNull).max(
+                    Comparator.comparing(this::getTimestamp)).orElse("");
+            final String timestamp = getTimestamp(date);
             final byte[] bytes = client.getBinaryVersion(identifier, timestamp);
             final String out = new String(bytes);
             assertEquals("Some new data\n", out);
@@ -449,7 +451,9 @@ class LdpClientTest extends CommonTrellisTest {
             assertTrue(client.putWithResponse(identifier, getTestResource(), contentTypeTurtle));
             final String profile = JSONLD.expanded.getIRIString();
             final String res = client.getJsonProfile(identifier, profile);
-            assertEquals(137, res.length());
+            final List<Map<String, Object>> obj = MAPPER.readValue(res, new TypeReference<List<Map<String, Object>>>() {
+            });
+            assertTrue(obj.stream().anyMatch(x -> x.containsKey("http://purl.org/dc/terms/title")));
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -588,7 +592,8 @@ class LdpClientTest extends CommonTrellisTest {
             metadata.put("Prefer", "return=representation; omit=\"" + LDP.PreferContainment.getIRIString() + "\"");
             metadata.put(ACCEPT, contentTypeJSONLD);
             final byte[] res = client.getBytesWithMetadata(identifier, metadata);
-            assertEquals(282, res.length);
+            String s = new String(res);
+            assertTrue(s.contains("http://www.w3.org/ns/oa#HttpRequestState"));
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }

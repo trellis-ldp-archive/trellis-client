@@ -15,3 +15,4 @@ An JDK incubator HTTP client for use with the [Trellis Linked Data Platform](htt
 
 ## API
 See [LDPClient](https://github.com/trellis-ldp/trellis-client/blob/master/client/src/main/java/org/trellisldp/client/LdpClient.java)
+

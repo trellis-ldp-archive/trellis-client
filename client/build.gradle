@@ -34,29 +34,27 @@ dependencies {
     implementation("javax.xml.bind:jaxb-api:2.3.0")
     implementation("org.apache.commons:commons-rdf-api:$commonsRdfVersion")
     implementation("org.apache.commons:commons-rdf-jena-jpms:$commonsRdfJenaVersion")
-    implementation("org.apache.jena:jena.arq-jpms:$jenaVersion")
-    implementation("org.apache.jena:jena.base-jpms:$jenaVersion")
-    implementation("org.apache.jena:jena.core-jpms:$jenaVersion")
-    implementation("org.apache.jena:jena.iri-jpms:$jenaVersion")
+    implementation("de.ubleipzig:jena.arq-jpms:$jenaVersion")
+    implementation("de.ubleipzig:jena.base-jpms:$jenaVersion")
+    implementation("de.ubleipzig:jena.core-jpms:$jenaVersion")
+    implementation("de.ubleipzig:jena.iri-jpms:$jenaVersion")
     implementation("org.trellisldp:trellis-vocabulary-jpms:$trellisVersion")
     implementation("org.slf4j:slf4j-api:$slf4jVersion")
 
     testImplementation("com.github.andrewoma.dexx:collection:$dexxCollectionVersion")
     testImplementation("com.github.jsonld-java:jsonld-java:$jsonldVersion") { force = true }
+    testImplementation("de.ubleipzig:jena.dboe-jpms:$jenaVersion")
+    testImplementation("de.ubleipzig:jena.rdfconnection-jpms:$jenaVersion")
+
     testImplementation("io.dropwizard:dropwizard-auth:$dropwizardVersion")
     testImplementation("io.dropwizard:dropwizard-testing:$dropwizardVersion")
     testImplementation("io.dropwizard:dropwizard-http2:$dropwizardVersion")
     testImplementation("io.jsonwebtoken:jjwt:$jsonWebTokenVersion")
     testImplementation("javax.activation:javax.activation-api:$activationApiVersion")
     testImplementation("org.apache.commons:commons-collections4:$commonsCollectionsVersion")
-    testImplementation("org.apache.jena:jena.rdfconnection-jpms:$jenaVersion")
     testImplementation("org.apache.httpcomponents:httpclient-cache:$httpclientVersion")
-    testImplementation("org.apache.jena:jena.dboe-jpms:$jenaVersion")
     testImplementation("org.apache.servicemix.bundles:org.apache.servicemix.bundles.kafka-clients:$kafkaVersion")
     testImplementation("org.apache.servicemix.bundles:org.apache.servicemix.bundles.mustache-compiler:$mustacheVersion")
-    testImplementation("org.apache.servicemix.bundles:org.apache.servicemix.bundles.xerces:$servicemixXercesVersion"){
-        exclude group: 'xml-apis', module: 'xml-apis'
-    }
     testImplementation("org.apache.thrift:libthrift:$thriftVersion")
     testImplementation("org.eclipse.jetty:jetty-alpn-java-server:$jettyAlpnVersion")
     testImplementation("org.trellisldp:trellis-agent-jpms:$trellisVersion")

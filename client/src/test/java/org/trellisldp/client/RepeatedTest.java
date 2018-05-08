@@ -15,13 +15,17 @@
 package org.trellisldp.client;
 
 import static org.apache.jena.arq.riot.WebContent.contentTypeJSONLD;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.InputStream;
+import java.util.UUID;
 
 import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.jena.JenaRDF;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 
 public class RepeatedTest extends CommonTrellisTest {
@@ -43,6 +47,15 @@ public class RepeatedTest extends CommonTrellisTest {
 
     }
 
+    @BeforeEach
+    void init() {
+        pid = "ldp-test-" + UUID.randomUUID().toString();
+    }
+
+    @AfterEach
+    void tearDown() {
+    }
+
     private static InputStream getTestJsonResource() {
         return LdpClientTest.class.getResourceAsStream("/webanno.complete-embedded.json");
     }
@@ -52,7 +65,7 @@ public class RepeatedTest extends CommonTrellisTest {
     void testRepeatedH1Put() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            client.put(identifier, getTestJsonResource(), contentTypeJSONLD);
+            assertTrue(client.putWithResponse(identifier, getTestJsonResource(), contentTypeJSONLD));
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }

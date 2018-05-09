@@ -1,1 +1,1 @@
-INSERT { <> <http://purl.org/dc/terms/title> "A title" } WHERE {}
+INSERT { <> <http://purl.org/dc/terms/title> "A new title" } WHERE {}

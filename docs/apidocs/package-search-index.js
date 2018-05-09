@@ -1,1 +1,0 @@
-packageSearchIndex = [{"m":"org.trellisldp.client","l":"org.trellisldp.client"}]

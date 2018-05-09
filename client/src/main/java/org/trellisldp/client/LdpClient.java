@@ -285,13 +285,22 @@ public interface LdpClient {
     /**
      * getResponse.
      *
+     * @param identifier identifier
+     * @return HttpResponse response
+     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+     */
+    HttpResponse getResponse(final IRI identifier) throws LdpClientException;
+
+    /**
+     * getResponseWithHeaders.
+     *
      * @param identifier a resource identifier
      * @param metadata a {@link Map} of headers
      * @return body and headers as a {@link Map}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
-    Map<String, Map<String, List<String>>> getResponse(final IRI identifier, final Map<String, String> metadata)
-            throws LdpClientException;
+    Map<String, Map<String, List<String>>> getResponseWithHeaders(final IRI identifier, final Map<String, String>
+            metadata) throws LdpClientException;
 
     /**
      * options.
@@ -360,18 +369,27 @@ public interface LdpClient {
     void postBinaryWithDigest(final IRI identifier, final InputStream stream, final String contentType, String
             digest) throws LdpClientException;
 
+
     /**
-     * newLdpDc.
+     * createBasicContainer.
+     *
+     * @param identifier a resource identifier
+     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+     */
+    void createBasicContainer(final IRI identifier) throws LdpClientException;
+
+    /**
+     * createDirectContainer.
      *
      * @param identifier a resource identifier
      * @param slug a resource name as a {@link String}
      * @param membershipObj a membership Object identifier
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
-    void newLdpDc(final IRI identifier, final String slug, IRI membershipObj) throws LdpClientException;
+    void createDirectContainer(final IRI identifier, final String slug, IRI membershipObj) throws LdpClientException;
 
     /**
-     * newLdpDcWithAuth.
+     * createDirectContainerWithAuth.
      *
      * @param identifier a resource identifier
      * @param slug a resource name as a {@link String}
@@ -379,8 +397,8 @@ public interface LdpClient {
      * @param authorization an authorization token
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
-    void newLdpDcWithAuth(final IRI identifier, final String slug, IRI membershipObj, String authorization) throws
-            LdpClientException;
+    void createDirectContainerWithAuth(final IRI identifier, final String slug, IRI membershipObj, String
+            authorization) throws LdpClientException;
 
     /**
      * put.
@@ -486,9 +504,10 @@ public interface LdpClient {
      *
      * @param identifier a resource identifier
      * @param stream an {@link InputStream}
+     * @return Boolean boolean
      * @throws LdpClientException an URISyntaxException
      */
-    void asyncPut(final IRI identifier, final InputStream stream) throws LdpClientException;
+    Boolean asyncPut(final IRI identifier, final InputStream stream) throws LdpClientException;
 
     /**
      * multiSubscriberAsyncGet.
@@ -497,8 +516,8 @@ public interface LdpClient {
      * @return an {@link Map}
      * @throws LdpClientException an URISyntaxException
      */
-    Map<HttpRequest, CompletableFuture<HttpResponse<String>>> multiSubscriberAsyncGet(
-            final IRI identifier) throws LdpClientException;
+    Map<HttpRequest, CompletableFuture<HttpResponse<String>>> multiSubscriberAsyncGet(final IRI identifier) throws
+            LdpClientException;
 
     /**
      * joiningCompleteableFuturePut.
@@ -506,7 +525,6 @@ public interface LdpClient {
      * @param bodies a Map of URI keys with InputStream values
      * @param contentType a content Type
      */
-    void joiningCompletableFuturePut(Map<URI, InputStream> bodies, final String
-            contentType);
+    void joiningCompletableFuturePut(Map<URI, InputStream> bodies, final String contentType);
 
 }

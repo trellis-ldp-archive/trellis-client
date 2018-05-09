@@ -62,6 +62,8 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Link;
 
+import jdk.incubator.http.HttpResponse;
+
 import org.apache.commons.rdf.api.Graph;
 import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.jena.JenaRDF;
@@ -123,10 +125,6 @@ class LdpClientTest extends CommonTrellisTest {
 
     private static InputStream getTestJsonResource() {
         return LdpClientTest.class.getResourceAsStream("/webanno.complete-embedded.json");
-    }
-
-    private static InputStream getTestN3Resource() {
-        return LdpClientTest.class.getResourceAsStream("/webanno.complete.nt");
     }
 
     private static InputStream getRevisedTestResource() {
@@ -414,7 +412,7 @@ class LdpClientTest extends CommonTrellisTest {
         try {
             final IRI identifier = rdf.createIRI(baseUrl);
             final String slug = pid;
-            client.newLdpDc(identifier, slug, identifier);
+            client.createDirectContainer(identifier, slug, identifier);
             final IRI containerIri = rdf.createIRI(baseUrl + pid);
             final IRI memberIri = rdf.createIRI(baseUrl + pid + "/test-member");
             assertTrue(client.putWithResponse(memberIri, getTestResource(), contentTypeTurtle));
@@ -432,7 +430,7 @@ class LdpClientTest extends CommonTrellisTest {
         try {
             final IRI identifier = rdf.createIRI(baseUrl);
             final String slug = pid;
-            client.newLdpDc(identifier, slug, identifier);
+            client.createDirectContainer(identifier, slug, identifier);
             final IRI containerIri = rdf.createIRI(baseUrl + pid);
             final IRI memberIri = rdf.createIRI(baseUrl + pid + "/test-member");
             assertTrue(client.putWithResponse(memberIri, getTestResource(), contentTypeTurtle));
@@ -601,14 +599,14 @@ class LdpClientTest extends CommonTrellisTest {
 
     @DisplayName("GetResponse")
     @Test
-    void testGetResponse() throws LdpClientException {
+    void testGetResponseWithHeaders() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
             assertTrue(client.putWithResponse(identifier, getTestGraph(), contentTypeTurtle));
             final Map<String, String> metadata = new HashMap<>();
             metadata.put("Prefer", "return=representation; omit=\"" + LDP.PreferContainment.getIRIString() + "\"");
             metadata.put(ACCEPT, contentTypeJSONLD);
-            final Map<String, Map<String, List<String>>> res = client.getResponse(identifier, metadata);
+            final Map<String, Map<String, List<String>>> res = client.getResponseWithHeaders(identifier, metadata);
             final String body = res.entrySet().stream().map(Map.Entry::getKey).findFirst().orElse("");
             final Map<String, List<String>> headers = res.entrySet().stream().map(
                     Map.Entry::getValue).findFirst().orElse(null);
@@ -642,8 +640,10 @@ class LdpClientTest extends CommonTrellisTest {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
             final IRI container = rdf.createIRI(baseUrl);
-            client.newLdpDc(container, pid, container);
+            client.createDirectContainer(container, pid, container);
             client.post(identifier, getTestResource(), contentTypeTurtle);
+            HttpResponse res = client.getResponse(identifier);
+            assertEquals(200, res.statusCode());
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -658,8 +658,10 @@ class LdpClientTest extends CommonTrellisTest {
             final Map<String, String> metadata = new HashMap<>();
             metadata.put(CONTENT_TYPE, contentTypeTextPlain);
             metadata.put("Digest", "md5=1VOyRwUXW1CPdC5nelt7GQ==");
-            client.newLdpDc(container, pid, container);
+            client.createDirectContainer(container, pid, container);
             client.postWithMetadata(identifier, getTestBinary(), metadata);
+            HttpResponse res = client.getResponse(identifier);
+            assertEquals(200, res.statusCode());
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -676,8 +678,10 @@ class LdpClientTest extends CommonTrellisTest {
             final String token =
                     "Bearer " + Jwts.builder().setSubject("test-user").setIssuer("http://localhost").signWith(
                             SignatureAlgorithm.HS512, key).compact();
-            client.newLdpDc(container, pid, container);
+            client.createDirectContainer(container, pid, container);
             client.postWithAuth(identifier, getTestResource(), contentTypeTurtle, token);
+            HttpResponse res = client.getResponse(identifier);
+            assertEquals(200, res.statusCode());
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -689,9 +693,11 @@ class LdpClientTest extends CommonTrellisTest {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
             final IRI container = rdf.createIRI(baseUrl);
-            client.newLdpDc(container, pid, container);
+            client.createDirectContainer(container, pid, container);
             final String slug = "namedResource";
             client.postSlug(identifier, slug, getTestResource(), contentTypeTurtle);
+            HttpResponse res = client.getResponse(identifier);
+            assertEquals(200, res.statusCode());
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -704,28 +710,46 @@ class LdpClientTest extends CommonTrellisTest {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
             final IRI container = rdf.createIRI(baseUrl);
             final String digest = "md5=1VOyRwUXW1CPdC5nelt7GQ==";
-            client.newLdpDc(container, pid, container);
+            client.createDirectContainer(container, pid, container);
             client.postBinaryWithDigest(identifier, getTestBinary(), contentTypeTextPlain, digest);
+            HttpResponse res = client.getResponse(identifier);
+            assertEquals(200, res.statusCode());
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
     }
 
-    @DisplayName("NewLdpDc")
+    @DisplayName("CreateBasicContainer")
     @Test
-    void testNewLdpDc() throws LdpClientException {
+    void testCreateBasicContainer() throws LdpClientException {
+        try {
+            final IRI identifier = rdf.createIRI(baseUrl + pid);
+            client.createBasicContainer(identifier);
+            HttpResponse res = client.getResponse(identifier);
+            assertEquals(200, res.statusCode());
+        } catch (Exception ex) {
+            throw new LdpClientException(ex.toString(), ex.getCause());
+        }
+    }
+
+    @DisplayName("CreateDirectContainer")
+    @Test
+    void testCreateDirectContainer() throws LdpClientException {
         try {
             final IRI identifier = rdf.createIRI(baseUrl);
             final String slug = pid;
-            client.newLdpDc(identifier, slug, identifier);
+            client.createDirectContainer(identifier, slug, identifier);
+            final IRI dc = rdf.createIRI(baseUrl + slug);
+            HttpResponse res = client.getResponse(dc);
+            assertEquals(200, res.statusCode());
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
     }
 
-    @DisplayName("NewLdpDcWithAuth")
+    @DisplayName("CreateDirectContainerWithAuth")
     @Test
-    void testNewLdpDcWithAuth() throws LdpClientException {
+    void testCreateDirectContainerWithAuth() throws LdpClientException {
         try {
             final IRI baseUri = rdf.createIRI(baseUrl);
             final String keyString = "secret";
@@ -734,7 +758,10 @@ class LdpClientTest extends CommonTrellisTest {
                     "Bearer " + Jwts.builder().setSubject("test-user").setIssuer("http://localhost").signWith(
                             SignatureAlgorithm.HS512, key).compact();
             final String slug = pid;
-            client.newLdpDcWithAuth(baseUri, slug, baseUri, token);
+            client.createDirectContainerWithAuth(baseUri, slug, baseUri, token);
+            final IRI dc = rdf.createIRI(baseUrl + slug);
+            HttpResponse res = client.getResponse(dc);
+            assertEquals(200, res.statusCode());
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -762,6 +789,8 @@ class LdpClientTest extends CommonTrellisTest {
             metadata.put("Etag", "053036f0a8a95b3ecf4fee30b9c3145f");
             assertTrue(client.putWithResponse(identifier, getTestResource(), contentTypeTurtle));
             client.putWithMetadata(identifier, getRevisedTestResource(), metadata);
+            HttpResponse res = client.getResponse(identifier);
+            assertEquals(200, res.statusCode());
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -775,6 +804,19 @@ class LdpClientTest extends CommonTrellisTest {
             final String etag = "053036f0a8a95b3ecf4fee30b9c3145f";
             assertTrue(client.putWithResponse(identifier, getTestResource(), contentTypeTurtle));
             client.putIfMatch(identifier, getRevisedTestResource(), contentTypeTurtle, etag);
+            HttpResponse res = client.getResponse(identifier);
+            assertEquals(200, res.statusCode());
+        } catch (Exception ex) {
+            throw new LdpClientException(ex.toString(), ex.getCause());
+        }
+    }
+
+    @DisplayName("AsyncPut")
+    @Test
+    void testAsyncPut() throws LdpClientException {
+        try {
+            final IRI identifier = rdf.createIRI(baseUrl + pid);
+            assertTrue(client.asyncPut(identifier, getTestResource()));
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -787,6 +829,8 @@ class LdpClientTest extends CommonTrellisTest {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
             final String digest = "md5=1VOyRwUXW1CPdC5nelt7GQ==";
             client.putBinaryWithDigest(identifier, getTestBinary(), contentTypeTextPlain, digest);
+            HttpResponse res = client.getResponse(identifier);
+            assertEquals(200, res.statusCode());
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -799,6 +843,8 @@ class LdpClientTest extends CommonTrellisTest {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
             final String time = "Wed, 19 Oct 2016 10:15:00 GMT";
             client.putIfUnmodified(identifier, getTestBinary(), contentTypeTextPlain, time);
+            HttpResponse res = client.getResponse(identifier);
+            assertEquals(200, res.statusCode());
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -811,11 +857,14 @@ class LdpClientTest extends CommonTrellisTest {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
             assertTrue(client.putWithResponse(identifier, getTestBinary(), contentTypeTextPlain));
             client.delete(identifier);
+            HttpResponse res = client.getResponse(identifier);
+            assertEquals(410, res.statusCode());
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
     }
 
+    @Disabled
     @DisplayName("Patch")
     @Test
     void testPatch() throws LdpClientException {
@@ -823,6 +872,8 @@ class LdpClientTest extends CommonTrellisTest {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
             assertTrue(client.putWithResponse(identifier, getTestResource(), contentTypeTurtle));
             client.patch(identifier, getSparqlUpdate());
+            final String res = client.getDefaultType(identifier);
+            assertTrue(res.contains("A new title"));
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }

@@ -15,7 +15,7 @@
 package org.trellisldp.client;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 import static org.trellisldp.api.RDFUtils.getInstance;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -47,7 +47,8 @@ import org.trellisldp.io.JenaIOService;
  */
 public final class TestUtils {
 
-    private static final IOService ioService = new JenaIOService(new NoopNamespaceService(), null, emptyMap());
+    private static final IOService ioService = new JenaIOService(
+            new NoopNamespaceService(), null, null, emptySet(), emptySet());
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**
@@ -82,7 +83,7 @@ public final class TestUtils {
      */
     public static Graph readEntityAsGraph(final InputStream entity, final String baseURL, final RDFSyntax syntax) {
         final Graph g = getInstance().createGraph();
-        getIOService().read(entity, baseURL, syntax).forEach(g::add);
+        getIOService().read(entity, syntax, baseURL).forEach(g::add);
         return g;
     }
 

@@ -33,7 +33,7 @@ dependencies {
     implementation("javax.ws.rs:javax.ws.rs-api:$jaxrsVersion")
     implementation("javax.xml.bind:jaxb-api:2.3.0")
     implementation("org.apache.commons:commons-rdf-api:$commonsRdfVersion")
-    implementation("org.apache.commons:commons-rdf-jena-jpms:$commonsRdfJenaVersion")
+    implementation("de.ubleipzig:commons-rdf-jena-jpms:$commonsRdfJenaVersion")
     implementation("de.ubleipzig:jena.arq-jpms:$jenaVersion")
     implementation("de.ubleipzig:jena.base-jpms:$jenaVersion")
     implementation("de.ubleipzig:jena.core-jpms:$jenaVersion")

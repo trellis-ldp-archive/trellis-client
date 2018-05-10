@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import jdk.incubator.http.HttpRequest;
-import jdk.incubator.http.HttpResponse;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 import org.apache.commons.rdf.api.IRI;
 
@@ -509,17 +509,7 @@ public interface LdpClient {
      */
     Boolean asyncPut(final IRI identifier, final InputStream stream) throws LdpClientException;
 
-    /**
-     * multiSubscriberAsyncGet.
-     *
-     * @param identifier a resource identifier
-     * @return an {@link Map}
-     * @throws LdpClientException an URISyntaxException
-     */
-    Map<HttpRequest, CompletableFuture<HttpResponse<String>>> multiSubscriberAsyncGet(final IRI identifier) throws
-            LdpClientException;
-
-    /**
+     /**
      * joiningCompleteableFuturePut.
      *
      * @param bodies a Map of URI keys with InputStream values

@@ -110,6 +110,5 @@ class LdpClientExceptionTest {
         assertThrows(LdpClientException.class, () -> client.putIfUnmodified(identifier, null, null, null));
         assertThrows(LdpClientException.class, () -> client.delete(identifier));
         assertThrows(LdpClientException.class, () -> client.patch(identifier, null));
-        assertThrows(LdpClientException.class, () -> client.multiSubscriberAsyncGet(identifier));
     }
 }

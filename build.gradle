@@ -20,7 +20,7 @@ ext {
     /* Testing */
     activationApiVersion = '1.2.0'
     commonsCollectionsVersion = '4.1'
-    commonsRdfJenaVersion = '0.6.0-SNAPSHOT'
+    commonsRdfJenaVersion = '1.0.0-SNAPSHOT'
     commonsRdfVersion = '0.5.0'
     dexxCollectionVersion = '0.7'
     dropwizardVersion = '1.2.0'
@@ -139,8 +139,8 @@ allprojects { subproj ->
 
 subprojects { subproj ->
 
-    sourceCompatibility = 1.10
-    targetCompatibility = 1.10
+    sourceCompatibility = 1.11
+    targetCompatibility = 1.11
 
     checkstyle {
         configFile = rootProject.file('buildtools/src/main/resources/checkstyle/checkstyle.xml')

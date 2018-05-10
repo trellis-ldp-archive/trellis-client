@@ -34,8 +34,8 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.net.ssl.SSLContext;
 
-import jdk.incubator.http.HttpRequest;
-import jdk.incubator.http.HttpResponse;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.jena.JenaRDF;
@@ -120,17 +120,6 @@ public class H2ClientTest {
             h2client.put(identifier, getTestJsonResource(), contentTypeJSONLD);
             final Map<String, List<String>> headers = h2client.head(identifier);
             assertTrue(headers.containsKey(LINK));
-        } catch (Exception ex) {
-            throw new LdpClientException(ex.toString(), ex.getCause());
-        }
-    }
-
-    @Test
-    void testNonBlockingAsyncGet() throws Exception {
-        try {
-            final IRI identifier = rdf.createIRI(baseUrl + pid);
-            final Map<HttpRequest, CompletableFuture<HttpResponse<String>>> results = h2client.multiSubscriberAsyncGet(
-                    identifier);
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }

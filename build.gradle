@@ -20,7 +20,7 @@ ext {
     /* Testing */
     activationApiVersion = '1.2.0'
     commonsCollectionsVersion = '4.1'
-    commonsRdfJenaVersion = '0.6.0-SNAPSHOT'
+    commonsRdfJenaVersion = '1.0.0-SNAPSHOT'
     commonsRdfVersion = '0.5.0'
     dexxCollectionVersion = '0.7'
     dropwizardVersion = '1.2.0'
@@ -33,7 +33,7 @@ ext {
     junitVersion = '5.2.0'
     logbackVersion = '1.2.3'
     jaxrsVersion = '2.1'
-    kafkaVersion = '1.0.0_1'
+    kafkaVersion = '1.1.0'
     mustacheVersion = '0.9.5'
     slf4jVersion = '1.7.25'
     thriftVersion = '0.11.0'

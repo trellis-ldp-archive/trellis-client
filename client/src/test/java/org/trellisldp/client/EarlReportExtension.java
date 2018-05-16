@@ -17,6 +17,7 @@ package org.trellisldp.client;
 import static java.time.LocalDateTime.now;
 import static org.apache.jena.arq.riot.RDFFormat.NQUADS;
 
+import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.core.JsonLdOptions;
 import com.github.jsonldjava.utils.JsonUtils;
 
@@ -120,9 +121,10 @@ public class EarlReportExtension implements BeforeTestExecutionCallback, AfterTe
     private static void writeFramedJsonLd(final OutputStream output, final DatasetGraph graph) {
         String n3 = writeGraphToN3(graph);
         final JsonLdOptions opts = new JsonLdOptions();
+        try {
         final Object outobj = com.github.jsonldjava.core.JsonLdProcessor.fromRDF(n3, opts);
         final InputStream fs = EarlReportExtension.class.getResourceAsStream("/earlreport/earlreport-frame.json");
-        try {
+
             final Object frame = JsonUtils.fromInputStream(fs);
             final Object frameobj = com.github.jsonldjava.core.JsonLdProcessor.frame(outobj, frame, opts);
             final String json = JsonUtils.toPrettyString(frameobj);
@@ -131,6 +133,8 @@ public class EarlReportExtension implements BeforeTestExecutionCallback, AfterTe
             output.close();
         } catch (IOException e) {
             e.getMessage();
+        } catch (JsonLdError jsonLdError) {
+            jsonLdError.printStackTrace();
         }
     }
 

@@ -43,6 +43,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -61,8 +62,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Link;
-
-import java.net.http.HttpResponse;
 
 import org.apache.commons.rdf.api.Graph;
 import org.apache.commons.rdf.api.IRI;

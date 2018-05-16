@@ -60,7 +60,7 @@ allprojects { subproj ->
     apply plugin: 'checkstyle'
     apply plugin: 'com.bmuschko.nexus'
     apply plugin: 'org.junit.platform.gradle.plugin'
-    apply plugin: 'jacoco'
+    //apply plugin: 'jacoco'
     apply plugin: 'com.kncept.junit5.reporter'
 
     ext {
@@ -75,15 +75,12 @@ allprojects { subproj ->
         license = 'Apache 2'
     }
 
-    jacoco.toolVersion = jacocoVersion
+    //jacoco.toolVersion = jacocoVersion
 
     group = 'org.trellisldp'
 
     repositories {
         mavenCentral()
-        flatDir {
-            dirs "$rootProject.projectDir/lib"
-        }
         maven {
             url "https://oss.sonatype.org/content/repositories/snapshots"
         }
@@ -122,11 +119,8 @@ allprojects { subproj ->
         tasks.withType(JavaCompile) {
             options.compilerArgs.add("-Xlint:unchecked")
             options.compilerArgs.add("-Xlint:deprecation")
-            options.compilerArgs.addAll(["--add-modules", "jdk.incubator.httpclient"])
         }
     }
-
-    junitPlatformTest.jvmArgs("--add-modules", "jdk.incubator.httpclient")
 
     dependencies {
         testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
@@ -139,8 +133,8 @@ allprojects { subproj ->
 
 subprojects { subproj ->
 
-    sourceCompatibility = 1.11
-    targetCompatibility = 1.11
+    sourceCompatibility = 1.10
+    targetCompatibility = 1.10
 
     checkstyle {
         configFile = rootProject.file('buildtools/src/main/resources/checkstyle/checkstyle.xml')
@@ -232,7 +226,7 @@ subprojects { subproj ->
             links 'https://commons.apache.org/proper/commons-rdf/apidocs/'
         }
     }
-
+/*
     afterEvaluate {
         if (subproj.name in jacocoTestProjects) {
             jacoco {
@@ -240,8 +234,10 @@ subprojects { subproj ->
             }
         }
     }
+*/
 }
 
+/*
 configure(rootProject) {
     task jacocoMerge(type: JacocoMerge) {
         subprojects.findAll { it.name in jacocoTestProjects }
@@ -266,3 +262,4 @@ configure(rootProject) {
         }
     }
 }
+*/

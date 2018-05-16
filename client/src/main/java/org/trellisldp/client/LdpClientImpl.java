@@ -14,8 +14,13 @@
 
 package org.trellisldp.client;
 
+import static java.net.http.HttpClient.Version.HTTP_2;
 import static java.net.http.HttpRequest.BodyPublishers.noBody;
+import static java.net.http.HttpRequest.BodyPublishers.ofInputStream;
+import static java.net.http.HttpRequest.BodyPublishers.ofString;
+import static java.net.http.HttpResponse.BodyHandlers.ofByteArray;
 import static java.net.http.HttpResponse.BodyHandlers.ofFile;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static java.time.Instant.ofEpochMilli;
 import static java.time.ZoneOffset.UTC;
 import static java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME;
@@ -27,37 +32,31 @@ import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static javax.ws.rs.core.HttpHeaders.ETAG;
 import static javax.ws.rs.core.HttpHeaders.LINK;
-import static java.net.http.HttpClient.Version.HTTP_2;
-import static java.net.http.HttpRequest.BodyPublishers.ofInputStream;
-import static java.net.http.HttpRequest.BodyPublishers.ofString;
-import static java.net.http.HttpResponse.BodyHandlers.ofString;
-import static java.net.http.HttpResponse.BodyHandlers.discarding;
-import static java.net.http.HttpResponse.BodyHandlers.ofByteArray;
 import static org.apache.jena.arq.riot.WebContent.contentTypeJSONLD;
 import static org.apache.jena.arq.riot.WebContent.contentTypeNTriples;
 import static org.apache.jena.arq.riot.WebContent.contentTypeSPARQLUpdate;
 import static org.apache.jena.arq.riot.WebContent.contentTypeTurtle;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLContext;
-
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 
 import org.apache.commons.rdf.api.IRI;
 import org.slf4j.Logger;
@@ -766,6 +765,23 @@ public class LdpClientImpl implements LdpClient {
             final URI uri = new URI(identifier.getIRIString());
             final HttpRequest req = HttpRequest.newBuilder(uri).headers(CONTENT_TYPE, contentType).PUT(
                     ofInputStream(() -> stream)).build();
+            final HttpResponse<String> response = client.send(req, ofString());
+            log.info(
+                    String.valueOf(response.version()) + " PUT request to {} returned {}", identifier,
+                    String.valueOf(response.statusCode()));
+        } catch (Exception ex) {
+            throw new LdpClientException(ex.toString(), ex.getCause());
+        }
+    }
+
+    @Override
+    public void putSupplier(final IRI identifier, Supplier<FileInputStream> fileInputStreamSupplier, final String contentType) throws
+            LdpClientException {
+        try {
+            requireNonNull(identifier, NON_NULL_IDENTIFIER);
+            final URI uri = new URI(identifier.getIRIString());
+            final HttpRequest req = HttpRequest.newBuilder(uri).headers(CONTENT_TYPE, contentType).PUT(
+                    ofInputStream(fileInputStreamSupplier)).build();
             final HttpResponse<String> response = client.send(req, ofString());
             log.info(
                     String.valueOf(response.version()) + " PUT request to {} returned {}", identifier,

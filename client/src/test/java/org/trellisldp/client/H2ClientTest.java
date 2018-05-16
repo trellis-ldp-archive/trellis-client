@@ -23,19 +23,23 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.dropwizard.testing.DropwizardTestSupport;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 import javax.net.ssl.SSLContext;
-
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 
 import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.jena.JenaRDF;
@@ -57,10 +61,10 @@ import org.trellisldp.app.triplestore.TrellisApplication;
 public class H2ClientTest {
     private static final DropwizardTestSupport<TrellisConfiguration> APP = new DropwizardTestSupport<>(
             TrellisApplication.class, resourceFilePath("trellis-config.yml"), config("server"
-                    + ".applicationConnectors[1].port", "8446"), config("binaries", resourceFilePath("data")
-                    + "/binaries"), config("mementos", resourceFilePath("data") + "/mementos"), config("namespaces",
-                    resourceFilePath("data/namespaces.json")), config("server.applicationConnectors[1].keyStorePath",
-                    resourceFilePath("keystore/trellis.jks")));
+            + ".applicationConnectors[1].port", "8446"), config("binaries", resourceFilePath("data")
+            + "/binaries"), config("mementos", resourceFilePath("data") + "/mementos"), config("namespaces",
+            resourceFilePath("data/namespaces.json")), config("server.applicationConnectors[1].keyStorePath",
+            resourceFilePath("keystore/trellis.jks")));
     private static final JenaRDF rdf = new JenaRDF();
     private static String baseUrl;
     private static String pid;
@@ -93,8 +97,8 @@ public class H2ClientTest {
     void tearDown() {
     }
 
-    private static InputStream getTestJsonResource() {
-        return H2ClientTest.class.getResourceAsStream("/webanno.complete-embedded.json");
+    private static Path getTestJsonResource() {
+        return Paths.get(H2ClientTest.class.getResource("/webanno.complete-embedded.json").getPath());
     }
 
     private static InputStream getTestN3Resource() {
@@ -117,7 +121,7 @@ public class H2ClientTest {
     void testRepeatedPutH2JsonResource() throws Exception {
         try {
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            h2client.put(identifier, getTestJsonResource(), contentTypeJSONLD);
+            h2client.putSupplier(identifier, fileInputStreamSupplier(getTestJsonResource()), contentTypeJSONLD);
             final Map<String, List<String>> headers = h2client.head(identifier);
             assertTrue(headers.containsKey(LINK));
         } catch (Exception ex) {
@@ -143,4 +147,19 @@ public class H2ClientTest {
         }
     }
 
+    static Supplier<FileInputStream> fileInputStreamSupplier(Path f) {
+        return new Supplier<>() {
+            Path file = f;
+            @Override
+            public FileInputStream get() {
+                try {
+                    PrivilegedExceptionAction<FileInputStream> pa =
+                            () -> new FileInputStream(file.toFile());
+                    return AccessController.doPrivileged(pa);
+                } catch (PrivilegedActionException x) {
+                    throw new UncheckedIOException((IOException)x.getCause());
+                }
+            }
+        };
+    }
 }

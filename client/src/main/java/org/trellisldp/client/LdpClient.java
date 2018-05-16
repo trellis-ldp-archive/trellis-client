@@ -14,15 +14,14 @@
 
 package org.trellisldp.client;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.util.function.Supplier;
 
 import org.apache.commons.rdf.api.IRI;
 
@@ -409,6 +408,16 @@ public interface LdpClient {
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
     void put(final IRI identifier, final InputStream stream, final String contentType) throws LdpClientException;
+
+    /**
+     * put.
+     *
+     * @param identifier a resource identifier
+     * @param fileInputStreamSupplier an {@link Supplier}
+     * @param contentType a content type
+     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+     */
+    void putSupplier(final IRI identifier, Supplier<FileInputStream> fileInputStreamSupplier, final String contentType) throws LdpClientException;
 
     /**
      * putWithResponse.

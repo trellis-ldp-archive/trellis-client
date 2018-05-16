@@ -1,3 +1,4 @@
 rootProject.name = 'trellis-client'
 include 'trellis-client'
 project(':trellis-client').projectDir = "$rootDir/client" as File
+enableFeaturePreview('STABLE_PUBLISHING')

@@ -53,7 +53,7 @@ dependencies {
     testImplementation("javax.activation:javax.activation-api:$activationApiVersion")
     testImplementation("org.apache.commons:commons-collections4:$commonsCollectionsVersion")
     testImplementation("org.apache.httpcomponents:httpclient-cache:$httpclientVersion")
-    testImplementation("org.apache.servicemix.bundles:org.apache.servicemix.bundles.kafka-clients:$kafkaVersion")
+    testImplementation("org.apache.kafka:kafka-clients:$kafkaVersion")
     testImplementation("com.github.spullara.mustache.java:compiler:$mustacheVersion")
     testImplementation("org.apache.thrift:libthrift:$thriftVersion")
     testImplementation("org.eclipse.jetty:jetty-alpn-java-server:$jettyAlpnVersion")

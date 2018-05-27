@@ -105,6 +105,10 @@ public class H2ClientTest {
         return H2ClientTest.class.getResourceAsStream("/webanno.complete.nt");
     }
 
+    private static InputStream getTestBinary() {
+        return H2ClientTest.class.getResourceAsStream("/00000001.tif");
+    }
+
     @RepeatedTest(10)
     void testRepeatedPutH2N3Resource() throws Exception {
         try {
@@ -142,6 +146,24 @@ public class H2ClientTest {
                 map.put(uri, is);
             }
             h2client.joiningCompletableFuturePut(map, contentTypeNTriples);
+        } catch (Exception ex) {
+            throw new LdpClientException(ex.toString(), ex.getCause());
+        }
+    }
+
+    @Test
+    void testJoiningCompletableFuturePutBinary() throws Exception {
+        try {
+            final Map<URI, InputStream> map = new HashMap<>();
+            final int LOOPS = 20;
+            for (int i = 0; i < LOOPS; i++) {
+                pid = "ldp-test-" + UUID.randomUUID().toString();
+                final IRI identifier = rdf.createIRI(baseUrl + pid + ".tif");
+                final URI uri = new URI(identifier.getIRIString());
+                final InputStream is = getTestBinary();
+                map.put(uri, is);
+            }
+            h2client.joiningCompletableFuturePut(map, "image/tiff");
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }

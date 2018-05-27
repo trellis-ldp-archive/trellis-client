@@ -8,6 +8,8 @@ server:
       keyStorePassword: "changeme"
       validateCerts: false
       validatePeers: false
+    - type: h2c
+      port: 8446
 logging:
   level: WARN
   loggers:

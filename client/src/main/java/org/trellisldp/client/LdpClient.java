@@ -62,7 +62,7 @@ public interface LdpClient {
     /**
      * getWithContentType.
      *
-     * @param identifier a resource identifier
+     * @param identifier  a resource identifier
      * @param contentType a content type (text/turtle, application/n-triples or application/ld+json)
      * @return body as a {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
@@ -73,7 +73,7 @@ public interface LdpClient {
      * getAcceptDatetime.
      *
      * @param identifier a resource identifier
-     * @param timestamp an epoch millisecond
+     * @param timestamp  an epoch millisecond
      * @return headers as a {@link Map}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
@@ -92,7 +92,7 @@ public interface LdpClient {
      * getTimeMapJsonProfile.
      *
      * @param identifier a resource identifier
-     * @param profile a JSON-LD profile
+     * @param profile    a JSON-LD profile
      * @return body as a {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      * @see <a href="https://www.w3.org/ns/json-ld">The JSON-LD Vocabulary</a>
@@ -103,8 +103,8 @@ public interface LdpClient {
      * getVersionJson.
      *
      * @param identifier a resource identifier
-     * @param profile a JSON-LD profile
-     * @param timestamp an epoch millisecond
+     * @param profile    a JSON-LD profile
+     * @param timestamp  an epoch millisecond
      * @return body as a {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      * @see <a href="https://www.w3.org/ns/json-ld">The JSON-LD Vocabulary</a>
@@ -115,7 +115,7 @@ public interface LdpClient {
      * getBinary.
      *
      * @param identifier a resource identifier
-     * @param file an output file as an {@link Path}
+     * @param file       an output file as an {@link Path}
      * @return body as a {@link Path}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
@@ -134,7 +134,7 @@ public interface LdpClient {
      * getBinaryDigest.
      *
      * @param identifier a resource identifier
-     * @param algorithm a digest algorithm (md5, sha, sha-256 or sha-512)
+     * @param algorithm  a digest algorithm (md5, sha, sha-256 or sha-512)
      * @return digest as a {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
@@ -144,8 +144,8 @@ public interface LdpClient {
      * getBinaryVersion.
      *
      * @param identifier a resource identifier
-     * @param file an output file as an {@link Path}
-     * @param timestamp an epoch millisecond
+     * @param file       an output file as an {@link Path}
+     * @param timestamp  an epoch millisecond
      * @return body as a  {@link Path}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
@@ -155,7 +155,7 @@ public interface LdpClient {
      * getBinaryVersion.
      *
      * @param identifier a resource identifier
-     * @param timestamp an epoch millisecond
+     * @param timestamp  an epoch millisecond
      * @return body as a byte[]
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
@@ -165,7 +165,7 @@ public interface LdpClient {
      * getRange.
      *
      * @param identifier a resource identifier
-     * @param byterange a byterange
+     * @param byterange  a byterange
      * @return body as a byte[]
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
@@ -175,7 +175,7 @@ public interface LdpClient {
      * getPrefer.
      *
      * @param identifier a resource identifier
-     * @param prefer an LDP preference
+     * @param prefer     an LDP preference
      * @return body as a {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      * @see <a href="https://www.w3.org/TR/ldp/#prefer-parameters">7.2 Preferences on the Prefer
@@ -196,7 +196,7 @@ public interface LdpClient {
      * getJsonProfile.
      *
      * @param identifier a resource identifier
-     * @param profile a JSON-LD profile
+     * @param profile    a JSON-LD profile
      * @return body as a {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      * @see <a href="https://www.w3.org/ns/json-ld">The JSON-LD Vocabulary</a>
@@ -207,10 +207,10 @@ public interface LdpClient {
      * getJsonProfileLDF.
      *
      * @param identifier a resource identifier
-     * @param profile a JSON-LD profile
-     * @param subject RdfTerm as a {@link String}
-     * @param predicate RdfTerm as a {@link String}
-     * @param object RdfTerm as a {@link String}
+     * @param profile    a JSON-LD profile
+     * @param subject    RdfTerm as a {@link String}
+     * @param predicate  RdfTerm as a {@link String}
+     * @param object     RdfTerm as a {@link String}
      * @return body as a {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      * @see <a href="https://www.w3.org/ns/json-ld">The JSON-LD Vocabulary</a>
@@ -222,9 +222,9 @@ public interface LdpClient {
      * getJsonLDF.
      *
      * @param identifier a resource identifier
-     * @param subject RdfTerm as a {@link String}
-     * @param predicate RdfTerm as a {@link String}
-     * @param object RdfTerm as a {@link String}
+     * @param subject    RdfTerm as a {@link String}
+     * @param predicate  RdfTerm as a {@link String}
+     * @param object     RdfTerm as a {@link String}
      * @return body as a {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
@@ -233,7 +233,7 @@ public interface LdpClient {
     /**
      * getAcl.
      *
-     * @param identifier a resource identifier
+     * @param identifier  a resource identifier
      * @param contentType a content type as {@link String}
      * @return body as a {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
@@ -245,7 +245,7 @@ public interface LdpClient {
      * getCORS.
      *
      * @param identifier a resource identifier
-     * @param origin a root resource identifier
+     * @param origin     a root resource identifier
      * @return headers as a {@link Map}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
@@ -255,7 +255,7 @@ public interface LdpClient {
      * getCORSSimple.
      *
      * @param identifier a resource identifier
-     * @param origin a root resource identifier
+     * @param origin     a root resource identifier
      * @return headers as a {@link Map}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
@@ -265,7 +265,7 @@ public interface LdpClient {
      * getWithMetadata.
      *
      * @param identifier a resource identifier
-     * @param metadata a {@link Map} of headers
+     * @param metadata   a {@link Map} of headers
      * @return body as a {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
@@ -275,7 +275,7 @@ public interface LdpClient {
      * getBytesWithMetadata.
      *
      * @param identifier a resource identifier
-     * @param metadata a {@link Map} of headers
+     * @param metadata   a {@link Map} of headers
      * @return body as a byte[]
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
@@ -294,7 +294,7 @@ public interface LdpClient {
      * getResponseWithHeaders.
      *
      * @param identifier a resource identifier
-     * @param metadata a {@link Map} of headers
+     * @param metadata   a {@link Map} of headers
      * @return body and headers as a {@link Map}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
@@ -315,15 +315,15 @@ public interface LdpClient {
      * H2c writes require a "preflight" options to upgrade the 1.1 connection before streams can be read.
      *
      * @param identifier a resource identifier
-     * @throws LdpClientException
+     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
     void initUpgrade(final IRI identifier) throws LdpClientException;
 
     /**
      * post.
      *
-     * @param identifier a resource identifier
-     * @param stream an {@link InputStream}
+     * @param identifier  a resource identifier
+     * @param stream      an {@link InputStream}
      * @param contentType a content type
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
@@ -333,8 +333,8 @@ public interface LdpClient {
      * postWithMetadata.
      *
      * @param identifier a resource identifier
-     * @param stream an {@link InputStream}
-     * @param metadata a {@link Map} of headers
+     * @param stream     an {@link InputStream}
+     * @param metadata   a {@link Map} of headers
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
     void postWithMetadata(final IRI identifier, final InputStream stream, final Map<String, String> metadata) throws
@@ -343,9 +343,9 @@ public interface LdpClient {
     /**
      * postWithAuth.
      *
-     * @param identifier a resource identifier
-     * @param stream an {@link InputStream}
-     * @param contentType a content type
+     * @param identifier    a resource identifier
+     * @param stream        an {@link InputStream}
+     * @param contentType   a content type
      * @param authorization an authorization token
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
@@ -355,9 +355,9 @@ public interface LdpClient {
     /**
      * postSlug.
      *
-     * @param identifier a resource identifier
-     * @param slug a resource name as a {@link String}
-     * @param stream an {@link InputStream}
+     * @param identifier  a resource identifier
+     * @param slug        a resource name as a {@link String}
+     * @param stream      an {@link InputStream}
      * @param contentType a content type
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
@@ -367,10 +367,10 @@ public interface LdpClient {
     /**
      * postBinaryWithDigest.
      *
-     * @param identifier a resource identifier
-     * @param stream an {@link InputStream}
+     * @param identifier  a resource identifier
+     * @param stream      an {@link InputStream}
      * @param contentType a content type
-     * @param digest a digest as a {@link String}
+     * @param digest      a digest as a {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      * @see <a href="https://tools.ietf.org/html/rfc3230#page-9">rfc3230 4.3.2 Digest</a>
      */
@@ -389,8 +389,8 @@ public interface LdpClient {
     /**
      * createDirectContainer.
      *
-     * @param identifier a resource identifier
-     * @param slug a resource name as a {@link String}
+     * @param identifier    a resource identifier
+     * @param slug          a resource name as a {@link String}
      * @param membershipObj a membership Object identifier
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
@@ -399,8 +399,8 @@ public interface LdpClient {
     /**
      * createDirectContainerWithAuth.
      *
-     * @param identifier a resource identifier
-     * @param slug a resource name as a {@link String}
+     * @param identifier    a resource identifier
+     * @param slug          a resource name as a {@link String}
      * @param membershipObj a membership Object identifier
      * @param authorization an authorization token
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
@@ -411,8 +411,8 @@ public interface LdpClient {
     /**
      * put.
      *
-     * @param identifier a resource identifier
-     * @param stream an {@link InputStream}
+     * @param identifier  a resource identifier
+     * @param stream      an {@link InputStream}
      * @param contentType a content type
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
@@ -421,18 +421,19 @@ public interface LdpClient {
     /**
      * put.
      *
-     * @param identifier a resource identifier
+     * @param identifier              a resource identifier
      * @param fileInputStreamSupplier an {@link Supplier}
-     * @param contentType a content type
+     * @param contentType             a content type
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
-    void putSupplier(final IRI identifier, Supplier<FileInputStream> fileInputStreamSupplier, final String contentType) throws LdpClientException;
+    void putSupplier(final IRI identifier, Supplier<FileInputStream> fileInputStreamSupplier, final String
+            contentType) throws LdpClientException;
 
     /**
      * putWithResponse.
      *
-     * @param identifier a resource identifier
-     * @param stream an {@link InputStream}
+     * @param identifier  a resource identifier
+     * @param stream      an {@link InputStream}
      * @param contentType a content type
      * @return status a {@link Boolean}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
@@ -444,8 +445,8 @@ public interface LdpClient {
      * putWithMetadata.
      *
      * @param identifier a resource identifier
-     * @param stream an {@link InputStream}
-     * @param metadata a {@link Map} of headers
+     * @param stream     an {@link InputStream}
+     * @param metadata   a {@link Map} of headers
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
     void putWithMetadata(final IRI identifier, final InputStream stream, final Map<String, String> metadata) throws
@@ -454,9 +455,9 @@ public interface LdpClient {
     /**
      * putWithAuth.
      *
-     * @param identifier a resource identifier
-     * @param stream an {@link InputStream}
-     * @param contentType a content Type as a {@link String}
+     * @param identifier    a resource identifier
+     * @param stream        an {@link InputStream}
+     * @param contentType   a content Type as a {@link String}
      * @param authorization an authorization token
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
@@ -466,10 +467,10 @@ public interface LdpClient {
     /**
      * putIfMatch.
      *
-     * @param identifier a resource identifier
-     * @param stream an {@link InputStream}
+     * @param identifier  a resource identifier
+     * @param stream      an {@link InputStream}
      * @param contentType a content type
-     * @param etag a strong Etag as a {@link String}
+     * @param etag        a strong Etag as a {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
     void putIfMatch(final IRI identifier, final InputStream stream, final String contentType, String etag) throws
@@ -478,10 +479,10 @@ public interface LdpClient {
     /**
      * putBinaryWithDigest.
      *
-     * @param identifier a resource identifier
-     * @param stream an {@link InputStream}
+     * @param identifier  a resource identifier
+     * @param stream      an {@link InputStream}
      * @param contentType a content type
-     * @param digest a digest as a {@link String}
+     * @param digest      a digest as a {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      * @see <a href="https://tools.ietf.org/html/rfc3230#page-9">rfc3230 4.3.2 Digest</a>
      */
@@ -491,10 +492,10 @@ public interface LdpClient {
     /**
      * putIfUnmodified.
      *
-     * @param identifier a resource identifier
-     * @param stream an {@link InputStream}
+     * @param identifier  a resource identifier
+     * @param stream      an {@link InputStream}
      * @param contentType a content type
-     * @param time an RFC_1123_DATE_TIME as an {@link String}
+     * @param time        an RFC_1123_DATE_TIME as an {@link String}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
     void putIfUnmodified(final IRI identifier, final InputStream stream, final String contentType, final String time)
@@ -512,7 +513,7 @@ public interface LdpClient {
      * patch.
      *
      * @param identifier a resource identifier
-     * @param stream an {@link InputStream}
+     * @param stream     an {@link InputStream}
      * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
      */
     void patch(final IRI identifier, final InputStream stream) throws LdpClientException;
@@ -521,16 +522,16 @@ public interface LdpClient {
      * asyncPut.
      *
      * @param identifier a resource identifier
-     * @param stream an {@link InputStream}
+     * @param stream     an {@link InputStream}
      * @return Boolean boolean
      * @throws LdpClientException an URISyntaxException
      */
     Boolean asyncPut(final IRI identifier, final InputStream stream) throws LdpClientException;
 
-     /**
+    /**
      * joiningCompleteableFuturePut.
      *
-     * @param bodies a Map of URI keys with InputStream values
+     * @param bodies      a Map of URI keys with InputStream values
      * @param contentType a content Type
      */
     void joiningCompletableFuturePut(Map<URI, InputStream> bodies, final String contentType);

@@ -137,7 +137,7 @@ public class H2ClientTest {
     void testJoiningCompletableFuturePut() throws Exception {
         try {
             final Map<URI, InputStream> map = new HashMap<>();
-            final int LOOPS = 400;
+            final int LOOPS = 100;
             for (int i = 0; i < LOOPS; i++) {
                 pid = "ldp-test-" + UUID.randomUUID().toString();
                 final IRI identifier = rdf.createIRI(baseUrl + pid);

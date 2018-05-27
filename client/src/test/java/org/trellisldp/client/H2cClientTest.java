@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.dropwizard.testing.DropwizardTestSupport;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
@@ -31,8 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-
-import javax.net.ssl.SSLContext;
 
 import jdk.incubator.http.HttpRequest;
 import jdk.incubator.http.HttpResponse;
@@ -51,14 +48,14 @@ import org.trellisldp.app.triplestore.TrellisApplication;
 
 
 /**
- * H2ClientTest.
+ * H2cClientTest.
  *
  * @author christopher-johnson
  */
-public class H2ClientTest {
+public class H2cClientTest {
     private static final DropwizardTestSupport<TrellisConfiguration> APP = new DropwizardTestSupport<>(
             TrellisApplication.class, resourceFilePath("trellis-config.yml"),
-            config("server.applicationConnectors[1].port", "8445"),
+            config("server.applicationConnectors[2].port", "8446"),
             config("binaries", resourceFilePath("data") + "/binaries"),
             config("mementos", resourceFilePath("data") + "/mementos"),
             config("namespaces", resourceFilePath("data/namespaces.json")),
@@ -71,14 +68,8 @@ public class H2ClientTest {
     @BeforeAll
     static void initAll() {
         APP.before();
-        baseUrl = "https://localhost:8445/";
-        try {
-            final SimpleSSLContext sslct = new SimpleSSLContext();
-            final SSLContext sslContext = sslct.get();
-            h2client = new LdpClientImpl(sslContext);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        baseUrl = "http://localhost:8446/";
+        h2client = new LdpClientImpl();
     }
 
     @AfterAll
@@ -106,6 +97,8 @@ public class H2ClientTest {
     @RepeatedTest(10)
     void testRepeatedPutH2N3Resource() throws Exception {
         try {
+            final IRI base = rdf.createIRI(baseUrl);
+            h2client.initUpgrade(base);
             final IRI identifier = rdf.createIRI(baseUrl + pid);
             h2client.put(identifier, getTestN3Resource(), contentTypeNTriples);
             final Map<String, List<String>> headers = h2client.head(identifier);
@@ -118,6 +111,8 @@ public class H2ClientTest {
     @RepeatedTest(10)
     void testRepeatedPutH2JsonResource() throws Exception {
         try {
+            final IRI base = rdf.createIRI(baseUrl);
+            h2client.initUpgrade(base);
             final IRI identifier = rdf.createIRI(baseUrl + pid);
             h2client.put(identifier, getTestJsonResource(), contentTypeJSONLD);
             final Map<String, List<String>> headers = h2client.head(identifier);
@@ -150,6 +145,8 @@ public class H2ClientTest {
                 final InputStream is = getTestN3Resource();
                 map.put(uri, is);
             }
+            final IRI base = rdf.createIRI(baseUrl);
+            h2client.initUpgrade(base);
             h2client.joiningCompletableFuturePut(map, contentTypeNTriples);
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
@@ -157,3 +154,4 @@ public class H2ClientTest {
     }
 
 }
+

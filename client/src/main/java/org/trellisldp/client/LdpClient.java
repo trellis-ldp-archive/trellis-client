@@ -312,6 +312,15 @@ public interface LdpClient {
     Map<String, List<String>> options(final IRI identifier) throws LdpClientException;
 
     /**
+     * initUpgrade.
+     * H2c writes require a "preflight" options to upgrade the 1.1 connection before streams can be read.
+     *
+     * @param identifier a resource identifier
+     * @throws LdpClientException an URISyntaxException, IOException or InterruptedException
+     */
+    void initUpgrade(final IRI identifier) throws LdpClientException;
+
+    /**
      * post.
      *
      * @param identifier a resource identifier

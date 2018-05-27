@@ -32,6 +32,7 @@ import static jdk.incubator.http.HttpRequest.BodyPublisher.noBody;
 import static jdk.incubator.http.HttpResponse.BodyHandler.asByteArray;
 import static jdk.incubator.http.HttpResponse.BodyHandler.asFile;
 import static jdk.incubator.http.HttpResponse.BodyHandler.asString;
+import static jdk.incubator.http.HttpResponse.BodyHandler.discard;
 import static org.apache.jena.arq.riot.WebContent.contentTypeJSONLD;
 import static org.apache.jena.arq.riot.WebContent.contentTypeNTriples;
 import static org.apache.jena.arq.riot.WebContent.contentTypeSPARQLUpdate;
@@ -606,6 +607,18 @@ public class LdpClientImpl implements LdpClient {
                     String.valueOf(response.version()) + " OPTIONS request to {} returned {}", identifier,
                     String.valueOf(response.statusCode()));
             return response.headers().map();
+        } catch (Exception ex) {
+            throw new LdpClientException(ex.toString(), ex.getCause());
+        }
+    }
+
+    @Override
+    public void initUpgrade(final IRI identifier) throws LdpClientException {
+        try {
+            requireNonNull(identifier, NON_NULL_IDENTIFIER);
+            final URI uri = new URI(identifier.getIRIString());
+            final HttpRequest req = HttpRequest.newBuilder(uri).method("OPTIONS", noBody()).build();
+            client.send(req, discard(null));
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }

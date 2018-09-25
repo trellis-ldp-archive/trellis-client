@@ -14,6 +14,7 @@
 
 package org.trellisldp.client;
 
+import static java.net.http.HttpClient.Redirect.ALWAYS;
 import static java.net.http.HttpClient.Version.HTTP_2;
 import static java.net.http.HttpRequest.BodyPublishers.noBody;
 import static java.net.http.HttpRequest.BodyPublishers.ofInputStream;
@@ -99,12 +100,13 @@ public class LdpClientImpl implements LdpClient {
 
     static HttpClient getClient() {
         final ExecutorService exec = Executors.newCachedThreadPool();
-        return HttpClient.newBuilder().executor(exec).build();
+        return HttpClient.newBuilder().executor(exec).followRedirects(ALWAYS).build();
     }
 
     static HttpClient getH2Client(final SSLContext sslContext) {
         final ExecutorService exec = Executors.newCachedThreadPool();
-        return HttpClient.newBuilder().executor(exec).sslContext(sslContext).version(HTTP_2).build();
+        return HttpClient.newBuilder().executor(exec).sslContext(sslContext)
+                .followRedirects(ALWAYS).version(HTTP_2).build();
     }
 
     static String buildLDFQuery(final String subject, final String predicate, final String object) {

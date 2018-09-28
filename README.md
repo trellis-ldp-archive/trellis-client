@@ -8,7 +8,7 @@
 An JDK incubator HTTP client for use with the [Trellis Linked Data Platform](https://trellis-ldp.github.io/trellis/apidocs/).
 
 ## Requirements
-* [JDK 10](http://jdk.java.net/10/) or higher
+* [jdk-11-ea+12](http://jdk.java.net/11/) or higher
 
 ### Building
     $ ./gradlew clean build

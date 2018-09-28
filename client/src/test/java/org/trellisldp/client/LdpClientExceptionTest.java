@@ -65,6 +65,7 @@ class LdpClientExceptionTest {
     //Note: for exception test coverage
     @Test
     void testURISyntaxException() {
+        assertThrows(LdpClientException.class, () -> client.asyncPut(identifier, null));
         assertThrows(LdpClientException.class, () -> client.head(identifier));
         assertThrows(LdpClientException.class, () -> client.getJson(identifier));
         assertThrows(LdpClientException.class, () -> client.getDefaultType(identifier));
@@ -110,6 +111,5 @@ class LdpClientExceptionTest {
         assertThrows(LdpClientException.class, () -> client.putIfUnmodified(identifier, null, null, null));
         assertThrows(LdpClientException.class, () -> client.delete(identifier));
         assertThrows(LdpClientException.class, () -> client.patch(identifier, null));
-        assertThrows(LdpClientException.class, () -> client.multiSubscriberAsyncGet(identifier));
     }
 }

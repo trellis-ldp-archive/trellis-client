@@ -1,1 +1,1 @@
-packageSearchIndex = [{"m":"org.trellisldp.client","l":"org.trellisldp.client"}]
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"m":"org.trellisldp.client","l":"org.trellisldp.client"}]

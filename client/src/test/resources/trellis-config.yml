@@ -17,6 +17,22 @@ logging:
     io.dropwizard: INFO
     org.trellisldp.client: DEBUG
 
+database:
+  driverClass: org.postgresql.Driver
+  user: postgres
+  password: postgres
+  url: jdbc:postgresql://localhost/postgres
+  properties:
+    charSet: UTF-8
+  maxWaitForConnection: 1s
+  validationQuery: "SELECT 1"
+  validationQueryTimeout: 3s
+  minSize: 8
+  maxSize: 32
+  checkConnectionWhileIdle: false
+  evictionInterval: 10s
+  minIdleTime: 1 minute
+
 # Path to binaries
 binaries: binaries
 

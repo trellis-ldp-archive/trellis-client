@@ -19,20 +19,30 @@ import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
 import static javax.ws.rs.core.HttpHeaders.LINK;
 import static org.apache.jena.arq.riot.WebContent.contentTypeJSONLD;
 import static org.apache.jena.arq.riot.WebContent.contentTypeNTriples;
+import static org.apache.jena.arq.riot.WebContent.contentTypeTextPlain;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.trellisldp.http.domain.HttpConstants.ACCEPT_PATCH;
 
 import io.dropwizard.testing.DropwizardTestSupport;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.URI;
+import java.net.http.HttpResponse;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-
-import jdk.incubator.http.HttpRequest;
-import jdk.incubator.http.HttpResponse;
+import java.util.function.Supplier;
 
 import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.jena.JenaRDF;
@@ -40,12 +50,11 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
-import org.trellisldp.app.config.TrellisConfiguration;
+import org.trellisldp.app.triplestore.AppConfiguration;
 import org.trellisldp.app.triplestore.TrellisApplication;
-
-
 
 /**
  * H2cClientTest.
@@ -53,13 +62,12 @@ import org.trellisldp.app.triplestore.TrellisApplication;
  * @author christopher-johnson
  */
 public class H2cClientTest {
-    private static final DropwizardTestSupport<TrellisConfiguration> APP = new DropwizardTestSupport<>(
-            TrellisApplication.class, resourceFilePath("trellis-config.yml"),
-            config("server.applicationConnectors[2].port", "8446"),
-            config("binaries", resourceFilePath("data") + "/binaries"),
-            config("mementos", resourceFilePath("data") + "/mementos"),
-            config("namespaces", resourceFilePath("data/namespaces.json")),
-            config("server.applicationConnectors[1].keyStorePath", resourceFilePath("keystore/trellis.jks")));
+    private static final DropwizardTestSupport<AppConfiguration> APP = new DropwizardTestSupport<>(
+            TrellisApplication.class, resourceFilePath("trellis-config.yml"), config("server"
+            + ".applicationConnectors[2].port", "8446"), config("binaries", resourceFilePath("data")
+            + "/binaries"), config("mementos", resourceFilePath("data") + "/mementos"), config("namespaces",
+            resourceFilePath("data/namespaces.json")), config("server.applicationConnectors[1].keyStorePath",
+            resourceFilePath("keystore/trellis.jks")));
     private static final JenaRDF rdf = new JenaRDF();
     private static String baseUrl;
     private static String pid;
@@ -86,12 +94,27 @@ public class H2cClientTest {
     void tearDown() {
     }
 
-    private static InputStream getTestJsonResource() {
-        return H2ClientTest.class.getResourceAsStream("/webanno.complete-embedded.json");
+    private static Path getTestJsonResource() {
+        return Paths.get(H2cClientTest.class.getResource("/webanno.complete-embedded.json").getPath());
     }
 
     private static InputStream getTestN3Resource() {
-        return H2ClientTest.class.getResourceAsStream("/webanno.complete.nt");
+        return H2cClientTest.class.getResourceAsStream("/webanno.complete.nt");
+    }
+
+    private static InputStream getTestBinary() {
+        return H2cClientTest.class.getResourceAsStream("/00000001.tif");
+    }
+
+    @Test
+    void testHead() throws LdpClientException {
+        try {
+            final IRI identifier = rdf.createIRI(Objects.requireNonNull(baseUrl));
+            final Map<String, List<String>> res = h2client.head(identifier);
+            assertTrue(res.containsKey(ACCEPT_PATCH));
+        } catch (Exception ex) {
+            throw new LdpClientException(ex.toString(), ex.getCause());
+        }
     }
 
     @RepeatedTest(10)
@@ -114,20 +137,9 @@ public class H2cClientTest {
             final IRI base = rdf.createIRI(baseUrl);
             h2client.initUpgrade(base);
             final IRI identifier = rdf.createIRI(baseUrl + pid);
-            h2client.put(identifier, getTestJsonResource(), contentTypeJSONLD);
+            h2client.putSupplier(identifier, fileInputStreamSupplier(getTestJsonResource()), contentTypeJSONLD);
             final Map<String, List<String>> headers = h2client.head(identifier);
             assertTrue(headers.containsKey(LINK));
-        } catch (Exception ex) {
-            throw new LdpClientException(ex.toString(), ex.getCause());
-        }
-    }
-
-    @Test
-    void testNonBlockingAsyncGet() throws Exception {
-        try {
-            final IRI identifier = rdf.createIRI(baseUrl + pid);
-            final Map<HttpRequest, CompletableFuture<HttpResponse<String>>> results = h2client.multiSubscriberAsyncGet(
-                    identifier);
         } catch (Exception ex) {
             throw new LdpClientException(ex.toString(), ex.getCause());
         }
@@ -137,7 +149,7 @@ public class H2cClientTest {
     void testJoiningCompletableFuturePut() throws Exception {
         try {
             final Map<URI, InputStream> map = new HashMap<>();
-            final int LOOPS = 100;
+            final int LOOPS = 400;
             for (int i = 0; i < LOOPS; i++) {
                 pid = "ldp-test-" + UUID.randomUUID().toString();
                 final IRI identifier = rdf.createIRI(baseUrl + pid);
@@ -153,5 +165,55 @@ public class H2cClientTest {
         }
     }
 
-}
+    @Test
+    void testJoiningCompletableFuturePutBinary() throws Exception {
+        try {
+            final Map<URI, InputStream> map = new HashMap<>();
+            final int LOOPS = 20;
+            for (int i = 0; i < LOOPS; i++) {
+                pid = "ldp-test-" + UUID.randomUUID().toString();
+                final IRI identifier = rdf.createIRI(baseUrl + pid + ".tif");
+                final URI uri = new URI(identifier.getIRIString());
+                final InputStream is = getTestBinary();
+                map.put(uri, is);
+            }
+            final IRI base = rdf.createIRI(baseUrl);
+            h2client.initUpgrade(base);
+            h2client.joiningCompletableFuturePut(map, "image/tiff");
+        } catch (Exception ex) {
+            throw new LdpClientException(ex.toString(), ex.getCause());
+        }
+    }
 
+    @DisplayName("Delete")
+    @Test
+    void testDelete() throws LdpClientException {
+        try {
+            final IRI identifier = rdf.createIRI(baseUrl + pid);
+            final IRI base = rdf.createIRI(baseUrl);
+            h2client.initUpgrade(base);
+            assertTrue(h2client.putWithResponse(identifier, getTestBinary(), contentTypeTextPlain));
+            h2client.delete(identifier);
+            HttpResponse res = h2client.getResponse(identifier);
+            assertEquals(410, res.statusCode());
+        } catch (Exception ex) {
+            throw new LdpClientException(ex.toString(), ex.getCause());
+        }
+    }
+
+    static Supplier<FileInputStream> fileInputStreamSupplier(Path f) {
+        return new Supplier<>() {
+            Path file = f;
+            @Override
+            public FileInputStream get() {
+                try {
+                    PrivilegedExceptionAction<FileInputStream> pa =
+                            () -> new FileInputStream(file.toFile());
+                    return AccessController.doPrivileged(pa);
+                } catch (PrivilegedActionException x) {
+                    throw new UncheckedIOException((IOException)x.getCause());
+                }
+            }
+        };
+    }
+}

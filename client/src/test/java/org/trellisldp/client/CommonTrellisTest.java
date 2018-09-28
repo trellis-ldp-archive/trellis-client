@@ -19,14 +19,15 @@ import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
 
 import io.dropwizard.testing.DropwizardTestSupport;
 
-import org.trellisldp.app.config.TrellisConfiguration;
+import org.trellisldp.app.triplestore.AppConfiguration;
 import org.trellisldp.app.triplestore.TrellisApplication;
 
 public abstract class CommonTrellisTest {
 
-    static final DropwizardTestSupport<TrellisConfiguration> APP = new DropwizardTestSupport<>(
+    static final DropwizardTestSupport<AppConfiguration> APP = new DropwizardTestSupport<>(
             TrellisApplication.class, resourceFilePath("trellis-config.yml"),
             config("server.applicationConnectors[0].port", "0"),
+            config("server.applicationConnectors[0].idleTimeout", "30 milliseconds"),
             config("binaries", resourceFilePath("data") + "/binaries"),
             config("mementos", resourceFilePath("data") + "/mementos"),
             config("namespaces", resourceFilePath("data/namespaces.json")),

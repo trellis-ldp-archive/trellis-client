@@ -26,6 +26,7 @@ ext {
     dropwizardVersion = '1.2.0'
     hamcrestLibraryVersion = '1.3'
     httpclientVersion = '4.5.3'
+    javaxAnnotationsVersion = '1.3.2'
     jenaVersion = '4.0.0-SNAPSHOT'
     jettyAlpnVersion = '9.4.8.v20171121'
     jsonldVersion = '0.12.0'
@@ -36,14 +37,15 @@ ext {
     kafkaVersion = '1.1.0'
     mustacheVersion = '0.9.5'
     slf4jVersion = '1.7.25'
+    tamayaVersion = '0.3-incubating'
     thriftVersion = '0.11.0'
-    trellisVersion = '0.7.0-SNAPSHOT'
+    trellisVersion = '0.8.0-SNAPSHOT'
 
     /* OSGI */
-    osgiEeJavaVersion = 'osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.10))'
+    osgiEeJavaVersion = 'osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.11))'
     projectOsgiVersion = project.version.replaceAll("-SNAPSHOT", ".SNAPSHOT")
 
-    jacocoVersion = '0.8.1'
+    jacocoVersion = '0.8.2'
     checkstyleVersion = '8.8'
 
     jacocoTestProjects = [
@@ -81,9 +83,6 @@ allprojects { subproj ->
 
     repositories {
         mavenCentral()
-        flatDir {
-            dirs "$rootProject.projectDir/lib"
-        }
         maven {
             url "https://oss.sonatype.org/content/repositories/snapshots"
         }
@@ -115,6 +114,7 @@ allprojects { subproj ->
                 force "de.ubleipzig:jena.rdfconnection-jpms:$jenaVersion"
                 cacheChangingModulesFor 0, 'seconds'
             }
+            exclude(module: 'javax.el-api')
         }
     }
 
@@ -122,11 +122,8 @@ allprojects { subproj ->
         tasks.withType(JavaCompile) {
             options.compilerArgs.add("-Xlint:unchecked")
             options.compilerArgs.add("-Xlint:deprecation")
-            options.compilerArgs.addAll(["--add-modules", "jdk.incubator.httpclient"])
         }
     }
-
-    junitPlatformTest.jvmArgs("--add-modules", "jdk.incubator.httpclient")
 
     dependencies {
         testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
@@ -140,7 +137,7 @@ allprojects { subproj ->
 subprojects { subproj ->
 
     sourceCompatibility = 1.10
-    targetCompatibility = 1.10
+    targetCompatibility = 1.11
 
     checkstyle {
         configFile = rootProject.file('buildtools/src/main/resources/checkstyle/checkstyle.xml')
@@ -227,7 +224,7 @@ subprojects { subproj ->
         }
         destinationDir = new File(rootDir, "docs/apidocs")
         options {
-            links "https://docs.oracle.com/javase/10/docs/api/"
+            links "https://docs.oracle.com/en/java/javase/11/docs/api/"
             links 'https://trellis-ldp.github.io/trellis/apidocs/'
             links 'https://commons.apache.org/proper/commons-rdf/apidocs/'
         }

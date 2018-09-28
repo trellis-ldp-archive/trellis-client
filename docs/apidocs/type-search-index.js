@@ -1,1 +1,1 @@
-typeSearchIndex = [{"p":"org.trellisldp.client","l":"ACLStatement"},{"p":"org.trellisldp.client","l":"LdpClient"},{"p":"org.trellisldp.client","l":"LdpClientException"},{"p":"org.trellisldp.client","l":"LdpClientImpl"}]
+typeSearchIndex = [{"p":"org.trellisldp.client","l":"ACLStatement"},{"l":"All Classes","url":"allclasses-index.html"},{"p":"org.trellisldp.client","l":"LdpClient"},{"p":"org.trellisldp.client","l":"LdpClientException"},{"p":"org.trellisldp.client","l":"LdpClientImpl"}]

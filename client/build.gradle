@@ -7,7 +7,8 @@ ext {
 
 javaModule {
     name = javaModuleName
-    extraTestModules = ['org.trellisldp.jpms.api','org.trellisldp.jpms.http', 'org.trellisldp.jpms.id', 'org.trellisldp.jpms.io', 'org.trellisldp.jpms.app.triplestore', 'org.trellisldp.jpms.app']
+    extraTestModules = ['org.trellisldp.jpms.api','org.trellisldp.jpms.http', 'org.trellisldp.jpms.id', 'org.trellisldp.jpms.io', 
+                        'org.trellisldp.jpms.app.triplestore', 'org.trellisldp.jpms.app']
     hacks {
         patches('javax.annotation:javax.annotation-api', 'org.apache.geronimo.specs:geronimo-annotation_1.2_spec')
         patches('org.apache.geronimo.specs:geronimo-jms_1.1_spec', 'javax.jms:javax.jms-api')
@@ -17,6 +18,9 @@ javaModule {
 
 configurations {
     all {
+        exclude group: 'org.apache.jena', module: 'jena-osgi'
+        exclude group: 'org.apache.activemq', module: 'activemq-client'
+        exclude group: 'org.apache.commons', module: 'commons-rdf-jena'
         exclude(module: 'jsr305')
         exclude group: 'commons-logging', module: 'commons-logging'
         exclude group: 'javax.inject', module: 'javax.inject'
@@ -48,18 +52,21 @@ dependencies {
 
     testImplementation("io.dropwizard:dropwizard-auth:$dropwizardVersion")
     testImplementation("io.dropwizard:dropwizard-testing:$dropwizardVersion")
-    testImplementation("io.dropwizard:dropwizard-http2:$dropwizardVersion")
+      testImplementation("io.dropwizard:dropwizard-http2:$dropwizardVersion")
     testImplementation("io.jsonwebtoken:jjwt:$jsonWebTokenVersion")
     testImplementation("javax.activation:javax.activation-api:$activationApiVersion")
+    testImplementation("javax.annotation:javax.annotation-api:$javaxAnnotationsVersion")
     testImplementation("org.apache.commons:commons-collections4:$commonsCollectionsVersion")
     testImplementation("org.apache.httpcomponents:httpclient-cache:$httpclientVersion")
     testImplementation("org.apache.kafka:kafka-clients:$kafkaVersion")
+    testImplementation("org.apache.tamaya:tamaya-core:$tamayaVersion")
     testImplementation("com.github.spullara.mustache.java:compiler:$mustacheVersion")
     testImplementation("org.apache.thrift:libthrift:$thriftVersion")
     testImplementation("org.eclipse.jetty:jetty-alpn-java-server:$jettyAlpnVersion")
     testImplementation("org.trellisldp:trellis-agent-jpms:$trellisVersion")
     testImplementation("org.trellisldp:trellis-api-jpms:$trellisVersion")
     testImplementation("org.trellisldp:trellis-app-jpms:$trellisVersion")
+    //testImplementation("org.trellisldp.ext:trellis-db-app:0.2.0-SNAPSHOT")
     testImplementation("org.trellisldp:trellis-app-triplestore-jpms:$trellisVersion")
     testImplementation("org.trellisldp:trellis-audit-jpms:$trellisVersion")
     testImplementation("org.trellisldp:trellis-constraint-rules-jpms:$trellisVersion")
